@@ -13,6 +13,10 @@
 // Second int is Y coordinate on display.
 void (*gDrawPixel)(int, int);
 
+// Same thing for setting the color
+// inputs are R, G, B.
+void (*gColorSet)(int, int, int)
+
 uint8_t drawing_initialized_flag = 0;
 
 // Store the size of the screen
@@ -38,8 +42,9 @@ int drawing_min(int a, int b) {
 // outputs nothing, and will draw the pixel to the screen
 // There are also two ints you must input, which are the width and 
 // height of the place we can draw onto.
-void drawing_init(void (*pixel_draw_func)(int, int), int w, int h) {
+void drawing_init(void (*pixel_draw_func)(int, int), void (*color_set_func)(int, int, int), int w, int h) {
 	gDrawPixel = pixel_draw_func;
+	gColorSet = color_set_func;
 	drawing_width = w;
 	drawing_height = h;
 	drawing_initialized_flag = 1;
@@ -52,8 +57,12 @@ void drawing_init(void (*pixel_draw_func)(int, int), int w, int h) {
 // int r - the radius of the circle
 void drawing_circle(int x, int y, int r) {
 	if (!drawing_initialized_flag) return;
-	for (int i = 0; i < drawing_width; i++) {
-		for (int j = 0; j < drawing_height; j++) {
+	int xStart = drawing_max(x-r, 0);
+	int xEnd = drawing_min(x+r, drawing_width);
+	int yStart = drawing_max(y-r, 0);
+	int yEnd = drawing_min(y+r, drawing_height);
+	for (int i = xStart; i < xEnd; i++) {
+		for (int j = yStart; j < yEnd; j++) {
 			if ((i-x)*(i-x)+(j-y)*(j-y) <= r*r) {
 				(*gDrawPixel)(i, j);
 			}
@@ -79,3 +88,16 @@ void drawing_rect(int x, int y, int w, int h) {
 		}
 	}
 } 
+
+// Draw a shooting star at (x, y).
+// To erase, just draw a rectangle over the old position.
+void drawing_star(int x, int y) {
+	if (!drawing_initialized_flag) return;
+	int grey_value = 31;
+	for (int i = 0; i < 5; i++) {
+		(*gColorSet)(grey_value, grey_value, grey_value);
+		grey_value += 32;
+		(*gDrawPixel)(x, y+i);
+	}
+}
+
