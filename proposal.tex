@@ -1,0 +1,225 @@
+\documentclass{article}
+\usepackage{geometry,graphicx,hyperref}
+
+\geometry{letterpaper,margin=1in}
+\def\gamename{Gravity Well}
+\def\gameti{\textit{\gamename } }
+\def\gametin{\textit{\gamename}}
+
+\title{Proposal: \gameti}
+\author{Sameer Bibikar, Sneha Pendharkar\\
+EE 319K -- Prof. Yerraballi}
+
+\begin{document}
+\maketitle
+\section{Overview}
+\gameti  is a physics-based two-dimensional obstacle course game.
+The player controls a spaceship fated to travel through an abnormal asteroid field.
+Each asteroid has a remarkable mass density and exerts a significant
+gravitational force on the spaceship. Thus, the player must not only navigate the field,
+but also predict the gravitational force on the spaceship and adjust the spaceship accordingly.
+\section{Basic Rules}
+\begin{itemize}
+	\item The player begins with three lives, which represent ship hull strength.
+	\item If the player collides with an asteroid, one of these lives will be lost.
+	\item If the player loses all his lives, the game is over.
+	\item Asteroids may come in different sizes, which means different mass and thus
+		a different gravitational force exerted on the ship.
+	\item The level (``field'') ends when the player passes a certain distance forward.
+	\item The player may only control the thrusters on the ship, not the ship's velocity
+		directly. This presents a considerable challenge, as the velocity of the
+		ship may not always be under the player's control!
+\end{itemize}
+\section{Features}
+\begin{itemize}
+	\item \textbf{Dynamic force-based physics engine} -- Realistic motion of the spaceship and asteroids
+		is possible.
+	\item \textbf{Hull repair toolkits} -- Remnants of ill-fated spaceships which allow 
+		the player to repair his own ship.
+	\item \textbf{Dynamic level generation} -- Asteroids will be placed automatically by
+		the \gameti  system according to a formula incorporating the difficulty.
+	\item \textbf{Score calculation} -- More efficient players are rewarded by giving
+		bonus points for quickness and hull repair toolkits collected.
+	\item (Optional.) \textbf{Dynamic menus} -- The main menus and help menus will use the
+		physics engine to display interesting animations such as a two-dimensional
+		star system, or relevant images to go along with the help text.
+\end{itemize}
+\section{Difficulty}
+This game could become very difficult to write (and computationally expensive!) easily.
+Challenges involved include:
+\begin{itemize}
+	\item Physics engine based on forces. This is mostly written, but must be incorporated
+		into any other code we will write. This should be fairly simple.
+	\item Scrolling screen. Since we want to keep the player at the center of the game,
+		all objects will be rendered relative to the spaceship instead of moving the
+		spaceship around. This will mean that we need to spend time thinking about 
+		how the rendering code will look, as the display's origin does not coincide with
+		the origin of the game's coordinate system. However, allowing the game's origin
+		to be wherever it needs to be means that the physics engine is allowed to be simple,
+		and few adjustments need to be made for scaling and translation of the coordinates
+		of entities to be rendered.
+	\item (Optional.) Dynamic background. Instead of one background image,
+		 \gameti  will use ``shooting star'' entities which
+		zoom around the background behind the asteroids. These will be sprites of 1x5, so
+		it will be trivial to erase the previous position of the entity and redraw the new
+		position. With this implementation, the background can also be dynamic, with randomized
+		shooting star positions and velocities, allowing for a more immersive experience.
+		However, rendering this many entities at once may be too computationally costly
+		for our little microcontroller, so this must be evaluated with that in mind.
+	\item Speed/frame rate must be constant, but this should be handled by a system timer, which
+		increments a counter in the main loop telling it how many more times it has to run to keep up.
+		It may be a challenge to keep the physics engine and drawing functions efficient enough
+		to properly run on time on the controller.
+	\item Music and audio. At the very least, we will have sound effects for menu items and things which
+		happen in the game. This will take up some processor time, but the code can be taken from a
+		previous lab.
+		An interrupt will be used to drive the sound.
+	\item Dynamic memory allocation. Since the level generation system will generate a random number of asteroids,
+		we cannot know how much memory to allocate beforehand. Thus, each pass, the generator
+		will use \verb malloc()  to allocate space for the asteroids. This space must be \verb free() 'd
+		later in order to conserve RAM.
+	\item Linked list. Since the list of asteroids will dynamically change, we will need to
+		provide a robust linked list implementation. 
+\end{itemize}
+
+\section{Hardware requirements fulfilled}
+\begin{itemize}
+	\item \textbf{Buttons} will be used to control menus and pause the game.
+	\item The \textbf{potentiometer} will be used to control the spaceship throttle.
+	\item The \textbf{display} will be used to display the game.
+	\item \textbf{Interrupts} will be used, at the very least, for sound.
+	\item \textbf{LEDs} will be used to show health and can flash when the ship is damaged.
+		If they are to flash, another interrupt will be used.
+	\item The \textbf{DAC} will be used for sound.
+\end{itemize}
+
+\section{Implementation decisions}
+\subsection{User input}
+
+Users will provide input to \gameti  by pushing buttons and adjusting the potentiometer.
+\gameti  will use GPIO interrupts on button press. The ISR will add the pushed button into a event queue,
+similar to that of SDL but far simpler. The main thread will poll this queue every tick and perform
+corresponding actions as needed.
+
+\subsection{Entities and updating}
+
+All objects on which physics can act will be associated with \verb Entity  structures. An object's
+ \verb Entity  keeps track of position, velocity, and mass of the object. This is all the physics engine requires in order to
+compute force, velocity and position on objects.
+
+When a collection of objects is not static, the pointers to the objects will be stored in a stack, which will be
+implemented with an array. Ideally, this will be of a fixed size per level, as every tick, the objects will be 
+popped off the stack to check if they are needed, and new objects could be added. When calculating the 
+gravitational force on the player, the stack will be treated as an array and iterated through.
+
+ When old objects
+are to be removed, all the objects will be popped off the stack and each checked if they are to be removed. 
+Any objects which are not to be deleted will be pushed onto a different stack of the same size. The pointer to the
+stack of the objects will be then updated to the new stack, and the pointer which originally pointed to the new
+stack will be updated to point to the stack from which the objects were popped.
+
+Since only pointers are stored in the array, and a maximum of around 100 objects will be in the collection,
+the RAM usage will be significant ($100 \times 4 = 400$ bytes for the pointers, and $100 \times 20 = 2$ kilobytes
+for the objects themselves) but not too much for the 32 kilobytes of RAM on the machine.
+
+Even though 100 objects will not be rendered on the screen at once, it is important to keep sufficient objects on 
+each side of the screen in case the user moves left or right. When objects are being created, they will be randomly
+dispersed within a range of distances in front of the ship, and a range left and right of the ship.
+
+As for shooting star objects, they can be tracked with a less complex system with a constant velocity in one direction
+only and no mass, allowing for a savings of 8 bytes per object. Thus, the RAM cost of having 100 of these objects is
+$100 \times 4 = 400$ bytes for the pointers, and $100 \times 12 = 1.2$ kilobytes for the objects themselves. 
+
+One caveat for this implementation, however, is that the \verb malloc()  and \verb free()  provided by
+\verb stdlib.h , as well as the garbage collection of old objects which we implement, must be good enough
+so as not to fill up the entire RAM with objects we don't need any more.
+
+\subsection{Main loop structure}
+
+In order to differentiate the two types of screens the user will see: menus and the game itself, each time the main loop
+runs, it will check a flag and execute the following accordingly:
+
+\begin{enumerate}
+\item \textbf {Menu}. An integer will keep track of which menu is shown at a particular time. Within the menu,
+a smaller loop will run, rendering/updating the menu screen if needed and polling the event queue. The physics
+engine may be used, but the potentiometers will not be polled.
+\item \textbf{Game}. Game parameters will be set according to the level number, and ship paramters will be initialized.
+Score may also be initialized if a new game was started. Then, the game will enter a \emph{game loop}, which is described
+in exhaustive detail in the next subsection. After the game loop is over, the game will check the exit status and enter
+a menu depending on this status (e.g. game over, next level, you win).
+\end{enumerate}
+
+\subsection{Game loop structure}
+
+This game loop is where the actual game is played. There are a number of steps which must occur every tick:
+
+\begin{enumerate}
+\item Poll the event queue and process each event. If the pause button is pressed, the screen will blank out,
+the text ``GAME PAUSED'' will display, and the game will wait for user input before doing anything else. (It is still
+within the game loop, waiting for input.) When the game is resumed, nothing will be redrawn at this stage because
+it will be redrawn later in the tick anyway.
+\item Poll the potentiometers and get the ship thruster force.
+\item Evaluate gravitational force on the ship. This requires that the game iterate through all asteroids and calculate 
+their gravitational force on the ship.
+\item Any object onto which forces are exerted must have its velocity updated using the found net force. So far, the
+only object to which this will happen is the player's spaceship.
+\item Any object which moved relative to the screen ($\vec{v}_{object} - \vec{v}_{player} \ne \vec0$) must be erased.
+\item Update position of all objects whose position need to be updated ($\vec{v} \ne \vec{0}$).
+\item Get rid of all objects which are below the screen by some threshold. (necessary to save RAM!)
+\item Draw all objects whose position changed on the screen (or redraw all objects if we're not tracking that)
+\item Check if the level is over; if so, set the menu flag and number and exit the game loop.
+\item Check collisions. If the player collided with a power-up, then increase the player's health. If it was an
+asteroid, then decrease the player's health.
+\item Check if the player died (health $\le 0$). If so, set the menu flag and number to ``game over'' and exit game loop.
+\item Every so often, generate new asteroids in front of the player.
+\item Repeat.
+\end{enumerate}
+
+\subsection{Sound}
+
+To keep things simple, we will implement a monophonic sound system in \gametin. By default, music will be playing, but
+it will be interrupted by sound effects when necessary. This means that we can keep the same system we implemented in the
+Piano DAC lab, but augment it with the sound effect system and remove the piano playing part. Two timer interrupts
+will be required to implement sound.
+
+\subsection{Graphics}
+
+The spaceship will be shown as a sprite, and asteroids will either be rendered as sprites or circles. The shooting stars
+will be rendered as tiny sprites of $5\times1$ pixels.
+
+In order to erase something on the screen, the entire hitbox of the object will be filled black. The object will then be
+redrawn in the new position.
+
+A bit of arithmetic is required to get the correct position to which to render the object on the screen. Since our API
+for the ST7735 treats $(0,0)$ as the top left corner of the display, we must first get the position of the object relative
+to the player's spaceship's top left corner:
+$$\vec s_{rel} = \vec s_{obj} - \vec s_{ship}$$
+In order for this to make sense, we need to have the physics engine treat the $+y$-direction as downwards onto the screen,
+basically the same direction that the ST7735 thinks $+y$ is.
+Then, we need to add to that the relative position of the ship on the screen, which should be close to the center of the screen.
+$$\vec s_{display} = \vec s_{rel} + \vec s_{shipdisplay}$$
+
+\subsection{Physics}
+
+The physics engine is entirely based on forces. For each object, the engine keeps track of mass, velocity, and position.
+Asteroids exert a gravitational force on the spaceship. This force is given by
+
+$$\vec F_g = \frac{Gm_1 m_2}{r^2}\hat r\textrm{,}$$
+
+\noindent where $G$ is a constant, $m_1$ and $m_2$ are the masses of the asteroid and spaceship, and $\vec r$ is the difference in
+position between the asteroid and spaceship.
+
+This force will be added to the force exerted on the spaceship by its thrusters, and the acceleration will be calculated 
+with the ubiquitous
+$$\vec F = m \vec a\textrm{.}$$
+
+Then the velocity and position of the object will be updated as follows:
+
+$$\Delta \vec v = \vec a \Delta t$$
+$$\Delta \vec s = \vec v \Delta t$$
+
+Note that the velocity and position of the ship are always given by the computer! While the player may have some control
+over the acceleration, if moving too quickly into an asteroid, there may be no escape.
+
+\end{document}
+
