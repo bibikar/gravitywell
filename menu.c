@@ -1,15 +1,8 @@
 #include "ST7735.h"
 #include "drawing.h"
 
-#define MENU_MAIN 0
-#define MENU_NEW_GAME 1
-#define MENU_HELP 2
-#define MENU_GAME_OVER 64
-#define MENU_NEXT_LEVEL 65
-#define MENU_YOU_WIN 66
-#define MENU_ERROR 126
-#define MENU_EXIT 127
-#define GAME_BEGIN 128
+// We have done some #defines in the menu.h file.
+#include "menu.h"
 
 #define LEFT_BUTTON 0x01
 #define RIGHT_BUTTON 0x02
