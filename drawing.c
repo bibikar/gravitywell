@@ -4,18 +4,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-
-// This is a function pointer!
-// Since I want to keep this code abstract right now, we will
-// have some external thing set this to something,
-// using the drawing_init function...
-// Inputs: The first int is X coordinate on display
-// Second int is Y coordinate on display.
-void (*gDrawPixel)(int, int);
-
-// Same thing for setting the color
-// inputs are R, G, B.
-void (*gColorSet)(int, int, int)
+#include "ST7735.h"
 
 uint8_t drawing_initialized_flag = 0;
 
@@ -42,9 +31,7 @@ int drawing_min(int a, int b) {
 // outputs nothing, and will draw the pixel to the screen
 // There are also two ints you must input, which are the width and 
 // height of the place we can draw onto.
-void drawing_init(void (*pixel_draw_func)(int, int), void (*color_set_func)(int, int, int), int w, int h) {
-	gDrawPixel = pixel_draw_func;
-	gColorSet = color_set_func;
+void drawing_init(int w, int h) {
 	drawing_width = w;
 	drawing_height = h;
 	drawing_initialized_flag = 1;
@@ -55,7 +42,7 @@ void drawing_init(void (*pixel_draw_func)(int, int), void (*color_set_func)(int,
 // Inputs: int x - the X coordinate of the center of the circle
 // int y - the Y coordinate of the center of the circle
 // int r - the radius of the circle
-void drawing_circle(int x, int y, int r) {
+void drawing_circle(int16_t x, int16_t y, int16_t r, int16_t color) {
 	if (!drawing_initialized_flag) return;
 	int xStart = drawing_max(x-r, 0);
 	int xEnd = drawing_min(x+r, drawing_width);
@@ -64,7 +51,7 @@ void drawing_circle(int x, int y, int r) {
 	for (int i = xStart; i < xEnd; i++) {
 		for (int j = yStart; j < yEnd; j++) {
 			if ((i-x)*(i-x)+(j-y)*(j-y) <= r*r) {
-				(*gDrawPixel)(i, j);
+				ST7735_DrawPixel(i, j, color);
 			}
 		}
 	}
@@ -76,28 +63,23 @@ void drawing_circle(int x, int y, int r) {
 // int y - Y coordinate of top left corner
 // int w - width of rectangle
 // int h - height of rectangle
-void drawing_rect(int x, int y, int w, int h) {
+void drawing_rect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t color) {
 	if (!drawing_initialized_flag) return;
 	int xStart = drawing_max(x, 0);
 	int xEnd = drawing_min(x+w, drawing_width);
 	int yStart = drawing_max(y, 0);
 	int yEnd = drawing_min(y+h, drawing_height);
-	for (int i = xStart; i < xEnd; i++) {
-		for (int j = yStart; j < yEnd; j++) {
-			(*gDrawPixel)(i, j);
-		}
-	}
+	ST7735_FillRect(xStart, yStart, xEnd-xStart, yEnd-yStart, color);
 } 
 
 // Draw a shooting star at (x, y).
 // To erase, just draw a rectangle over the old position.
 void drawing_star(int x, int y) {
 	if (!drawing_initialized_flag) return;
-	int grey_value = 31;
+	uint8_t grey_value = 31;
 	for (int i = 0; i < 5; i++) {
-		(*gColorSet)(grey_value, grey_value, grey_value);
+		ST7735_DrawPixel(x, y+i, ST7735_Color565(grey_value, grey_value, grey_value));
 		grey_value += 32;
-		(*gDrawPixel)(x, y+i);
 	}
 }
 
