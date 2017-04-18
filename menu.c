@@ -4,8 +4,12 @@
 #define MENU_MAIN 0
 #define MENU_NEW_GAME 1
 #define MENU_HELP 2
+#define MENU_GAME_OVER 64
+#define MENU_NEXT_LEVEL 65
+#define MENU_YOU_WIN 66
 #define MENU_ERROR 126
 #define MENU_EXIT 127
+#define GAME_BEGIN 128
 
 #define LEFT_BUTTON 0x01
 #define RIGHT_BUTTON 0x02
@@ -40,7 +44,10 @@ void menu_print_integer(uint8_t n) {
 // Returns a status code (0 = default success)
 // Any other status code given becomes the new menu id.
 // A status code above 127 means to go to the actual game.
-uint8_t show_menu(uint32_t id) {
+// The data to pass is uneccessary except for the following cases:
+// MENU_GAME_OVER, MENU_YOU_WIN: the score to display
+// MENU_NEXT_LEVEL: the next level to go to
+uint8_t show_menu(uint8_t id, uint32_t data) {
 	switch(id) {
 		case MENU_MAIN:
 			ST7735_SetCursor(4, 3);
@@ -94,7 +101,37 @@ uint8_t show_menu(uint32_t id) {
 				}
 			} while (help_screen_index < HELP_SCREEN_COUNT);
 			return MENU_MAIN;
+		case MENU_GAME_OVER:
+		case MENU_YOU_WIN:
+			// Data should have the score!!
+			ST7735_FillScreen(ST7735_Color565(0,0,0));
+			ST7735_SetCursor(3,9);
+			if (id == MENU_GAME_OVER) ST7735_OutString("GAME OVER");
+			else if (id == MENU_YOU_WIN) ST7735_OutString(" YOU WIN ");
+			ST7735_SetCursor(0,10);
+			ST7735_OutString("Score: ");
+			menu_print_integer(data);
+			ST7735_SetCursor(0,14);
+			ST7735_OutString("   Press any key\n   to continue...");
+			// Wait until some button is pressed.
+			while (menu_get_button_status == 0) {}
+			return MENU_MAIN;
+		case MENU_NEXT_LEVEL:
+			ST7735_FillScreen(ST7735_Color565(0,20,0));
+			ST7735_SetCursor(0,6);
+			ST7735_OutString("Field ");
+			menu_print_integer(data-1);
+			ST7735_OutString(" cleared");
+			ST7735_SetCursor(0,10);
+			ST7735_OutString("Score: ");
+			menu_print_integer(data);
+			ST7735_SetCursor(0,14);
+			ST7735_OutString("   Press any key\n   to continue...");
+			// Wait until some button is pressed.
+			while (menu_get_button_status == 0) {}
+			return GAME_BEGIN + data; // tell the main program we want to start the game with level specified by data.
 		case MENU_ERROR:
+		default:
 			// TODO Figure out how we want to handle errors.
 			// In fact, we probably don't even need this since the code should be bug-free.
 			ST7735_FillScreen(ST7735_Color565(255, 0, 0)); // color the screen red
@@ -111,8 +148,13 @@ uint8_t show_menu(uint32_t id) {
 				if (color == 0) count++;
 			}
 			return MENU_MAIN; // let's try to get back to the main menu.
-			
 	}
+}
+
+// Shows a menu which doesn't require any data parameter
+// Just abstracts out a call to show_menu anyway though
+uint8_t show_boring_menu(uint8_t id) {
+	return show_menu(id, 0);
 }
 
 uint8_t show_main_menu_selector(uint8_t rows[], uint8_t row_count) {
