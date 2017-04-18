@@ -1,5 +1,6 @@
 #include "ST7735.h"
 #include "drawing.h"
+#include "print.h"
 
 // We have done some #defines in the menu.h file.
 #include "menu.h"
@@ -27,10 +28,6 @@ uint8_t menu_get_button_status() {
 	// TODO add code to actually give the status of the buttons (which ones are pressed)
 	// use the #defines above.
 	return 0;
-}
-
-void menu_print_integer(uint8_t n) {
-	// TODO print an integer n to the screen.
 }
 
 // Shows the menu given by the id (see define statements)
@@ -70,9 +67,9 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 				ST7735_FillScreen(ST7735_Color565(help_screen_index*HELP_COLOR_MULTIPLIER_R, help_screen_index*HELP_COLOR_MULTIPLIER_G, help_screen_index*HELP_COLOR_MULTIPLIER_B));
 				// Tell the user we're in the help menu
 				ST7735_OutString("Help [");
-				menu_print_integer(help_screen_index+1);
+				LCD_OutDec(help_screen_index+1);
 				ST7735_OutChar('/');
-				menu_print_integer(HELP_SCREEN_COUNT);
+				LCD_OutDec(HELP_SCREEN_COUNT);
 				ST7735_OutChar(']');
 				// Move down to print the help string itself.
 				// Hopefully the newlines will actually work.
@@ -103,9 +100,9 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			else if (id == MENU_YOU_WIN) ST7735_OutString(" YOU WIN ");
 			ST7735_SetCursor(0,10);
 			ST7735_OutString("Score: ");
-			menu_print_integer(data);
+			LCD_OutDec(data);
 			ST7735_SetCursor(0,14);
-			ST7735_OutString("   Press any key\n   to continue...");
+			ST7735_OutString("   Press any key\n   to return...");
 			// Wait until some button is pressed.
 			while (menu_get_button_status == 0) {}
 			return MENU_MAIN;
@@ -113,11 +110,8 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			ST7735_FillScreen(ST7735_Color565(0,20,0));
 			ST7735_SetCursor(0,6);
 			ST7735_OutString("Field ");
-			menu_print_integer(data-1);
+			LCD_OutDec(data-1);
 			ST7735_OutString(" cleared");
-			ST7735_SetCursor(0,10);
-			ST7735_OutString("Score: ");
-			menu_print_integer(data);
 			ST7735_SetCursor(0,14);
 			ST7735_OutString("   Press any key\n   to continue...");
 			// Wait until some button is pressed.
