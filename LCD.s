@@ -19,6 +19,9 @@
 ; VCC (pin 2) connected to +3.3 V
 ; Gnd (pin 1) connected to ground
 
+DC                      EQU   0x40004100
+DC_COMMAND              EQU   0
+DC_DATA                 EQU   0x40
 GPIO_PORTA_DATA_R       EQU   0x400043FC
 SSI0_DR_R               EQU   0x40008008
 SSI0_SR_R               EQU   0x4000800C
@@ -62,9 +65,20 @@ writecommand
 ;4) Write the command to SSI0_DR_R
 ;5) Read SSI0_SR_R and check bit 4, 
 ;6) If bit 4 is high, loop back to step 5 (wait for BUSY bit to be low)
-
-    
-    
+	LDR R1,=SSI0_SR_R ; get address of SSI0_SR_R in R1
+bsyw1	LDR R2,[R1] ; get value of SSI0_SR_R in R2
+	ANDS R2,#SSI_SR_BSY ; mask SSI0_SR_R with bit 4
+	BNE bsyw1 ; if busy bit is 1, go back to bsyw1 and keep checking
+	LDR R1,=DC ; load portA data register address into R1
+	LDR R2,[R1] ; load port A data register value into R2
+	BIC R2,#DC_DATA ; clear DC_DATA bit (PA6 = 0x40)
+	STR R2,[R1] ; store it back
+	LDR R1,=SSI0_DR_R ; get address of SSI0_DR_R in R1
+	STR R0,[R1] ; store command into SSI0_DR_R
+	LDR R1,=SSI0_SR_R ; get address of SSI0_SR_R in R1
+bsyw2	LDR R2,[R1] ; get value of it in R2
+	ANDS R2,#SSI_SR_BSY ; mask it with bit 4
+	BNE bsyw2 ; if busy bit is 1, go back to bsyw2 and keep checking
     BX  LR                          ;   return
 
 ; This is a helper function that sends an 8-bit data to the LCD.
@@ -76,11 +90,22 @@ writedata
 ;2) If bit 1 is low loop back to step 1 (wait for TNF bit to be high)
 ;3) Set D/C=PA6 to one
 ;4) Write the 8-bit data to SSI0_DR_R
-
-    
-    
-    BX  LR                          ;   return
-
+	PUSH {R1, R2, R3, LR}
+loop
+	LDR R1, =SSI0_SR_R
+	LDR R1, [R1]	;R2 has the data of SSIO_SR_R
+	AND R1, R1, #0x02 ;get bit 1
+	CMP R1, #0
+	BEQ loop
+	LDR R2, =DC
+	LDR R3, [R2]
+	ORR R3, #DC_DATA	;setting PA6 to one
+	STR R3, [R2]
+	
+	LDR R1, =SSI0_DR_R
+	;R0 contains the data
+	STR R0, [R1] 
+	POP {R1, R2, R3, PC}	
 
 ;***************************************************
 ; This is a library for the Adafruit 1.8" SPI display.
