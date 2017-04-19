@@ -3,7 +3,7 @@
 // abstracts out on-board LEDs and buttons.
 
 #include <stdint.h>
-#include "tm4c123gh6pm.h"
+#include "../tm4c123gh6pm.h"
 
 // The switch on the left side of the board (if looking at the side with buttons)
 // is SW1 (which is PF4)

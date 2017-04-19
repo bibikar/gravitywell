@@ -6,7 +6,7 @@
 // Last modification date: change this to the last modification date or look very silly
 
 #include <stdint.h>
-#include "tm4c123gh6pm.h"
+#include "../tm4c123gh6pm.h"
 
 // ADC initialization function 
 // Input: none
