@@ -156,21 +156,27 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			return GAME_BEGIN + data; // tell the main program we want to start the game with level specified by data.
 		case MENU_ERROR:
 		default:
-			// TODO Figure out how we want to handle errors.
 			// In fact, we probably don't even need this since the code should be bug-free.
 			// But this is the default and will happen if we don't have a particular menu programmed.
 			//while(menu_get_button_status!=0){}	//wait for button to be released
 			ST7735_FillScreen(ST7735_Color565(255, 0, 0)); // color the screen red
-			ST7735_SetCursor(5,9);
-			ST7735_OutString("ERROR!");
+			ST7735_SetCursor(7,0);
+			ST7735_OutString("ERROR!\n");
+			ST7735_OutString("Most likely, you\nentered a menu which\ndoesn't exist.");
 			ST7735_SetCursor(0,10);
-			ST7735_OutString("Where am I?\nHow did I\nget here??\n");
-			ST7735_OutString("(TODO messages)");
+			ST7735_OutString("id=");
+			LCD_OutDec(id);
+			ST7735_SetCursor(0,11);
+			ST7735_OutString("data=");
+			LCD_OutDec(data);
+			ST7735_SetCursor(0,12);
+			ST7735_OutString("[Attempting to exit\n  to main menu...]");
+
 			uint16_t color = 0;
 			uint16_t count = 0;
-			// Cycle through all colors 5 times on this random pixel.
-			while (count < 5) {
-				ST7735_DrawPixel(100,100,color++);
+			// Cycle through all colors 2 times on this random pixel.
+			while (count < 2) {
+				ST7735_DrawPixel(id,data,color++);
 				if (color == 0) count++;
 			}
 			return MENU_MAIN; // let's try to get back to the main menu.
