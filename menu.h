@@ -1,6 +1,7 @@
 // menu.h
 // All public functions for menu.c
-// Author = Sameer Bibikar, 2017-04-18
+// Author = Sameer Bibikar, Sneha Pendharkar
+#include<stdint.h>
 
 #define MENU_MAIN 0
 #define MENU_NEW_GAME 1

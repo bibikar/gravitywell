@@ -3,7 +3,8 @@
 
 // The stack is basically a array of "pointers to void"
 // i.e. "pointers to anything"
-typedef (void *) *Stack;
+
+typedef void * (*Stack);
 
 // Initialize a new stack with maximum size given by capacity.
 // Use malloc to allocate enough space for this

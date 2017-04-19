@@ -38,7 +38,7 @@ void portf_set(uint8_t pin, uint8_t val) {
 
 // Gets the value (0 or 1) on pin.
 uint8_t portf_get(uint8_t pin) {
-	return 1 & (GPIO_PORTF_DATA_R >> pin);
+	return !(1 & (GPIO_PORTF_DATA_R >> pin));
 }
 
 // Toggles the pin.
