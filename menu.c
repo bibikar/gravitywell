@@ -24,10 +24,13 @@ static const char help_strings[][] = {
 	"This is the last\nhelp page, I think."
 };
 
+// Get the status of the buttons
+// PF4 is the button on the right (hence 0x02 in #defines)
+// PF0 is on the left
 uint8_t menu_get_button_status() {
-	// TODO add code to actually give the status of the buttons (which ones are pressed)
-	// use the #defines above.
-	return 0;
+	return portf_get(0) | (portf_get(4)<<1);
+	// It's a bit less efficient getting them separately, but 
+	// it's worth it to get it abstracted out.
 }
 
 // Shows the menu given by the id (see define statements)
