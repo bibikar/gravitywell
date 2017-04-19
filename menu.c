@@ -69,11 +69,11 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 				// Fill the screen with a blank color, but let's make it somewhat more interesting than just a color like that
 				ST7735_FillScreen(ST7735_Color565(help_screen_index*HELP_COLOR_MULTIPLIER_R, help_screen_index*HELP_COLOR_MULTIPLIER_G, help_screen_index*HELP_COLOR_MULTIPLIER_B));
 				// Tell the user we're in the help menu
-				ST7735_OutString("Help [");
+				ST7735_OutString("Help (");
 				LCD_OutDec(help_screen_index+1);
 				ST7735_OutChar('/');
 				LCD_OutDec(HELP_SCREEN_COUNT);
-				ST7735_OutChar(']');
+				ST7735_OutChar(')');
 				// Move down to print the help string itself.
 				// Hopefully the newlines will actually work.
 				// Otherwise we will need to write a function to
@@ -124,6 +124,7 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 		default:
 			// TODO Figure out how we want to handle errors.
 			// In fact, we probably don't even need this since the code should be bug-free.
+			// But this is the default and will happen if we don't have a particular menu programmed.
 			ST7735_FillScreen(ST7735_Color565(255, 0, 0)); // color the screen red
 			ST7735_SetCursor(5,9);
 			ST7735_OutString("ERROR!");
