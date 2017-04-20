@@ -28,15 +28,19 @@ uint8_t game_test()
 	
 	time = systick_getms();
 	drawing_circle(e2.posX/1000,e2.posY/1000, 5, ST7735_Color565(255,0,0));	
-	while(portf_get(0)==0)	//as long as PF0 is not pressed
-	{	int32_t *force= calc_grav(&e1, &e2);
+	while(portf_get(0)==0) { //as long as PF0 is not pressed		
+		// Calculate the force:
+		vec2 force = calc_grav(&e1, &e2);
+		// Get the time elapsed, in milliseconds:
 		dt = systick_getms()-time;
 		time = systick_getms();
-		e1.velX+=(force[0]*dt/e1.mass);
-		e1.velY+=(force[1]*dt/e1.mass);
+		// Update the velocities:
+		update_velocity(&e1, force, dt);
+		// Erase old objects:
 		drawing_circle(e1.posX/1000,e1.posY/1000, 5,0);	//erase the previous circle
 		//update the position
 		update_position(&e1, dt);
+		// Draw new objects:
 		drawing_circle(e1.posX/1000,e1.posY/1000, 5, ST7735_Color565(255,0,0));		
 	}
 	

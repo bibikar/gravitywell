@@ -71,6 +71,16 @@ void update_position(Entity *e, int32_t dt) {
 	e->posY += e->velY * dt;
 }
 
+// update_position(e, dt)
+// Update position of e using its velocity values
+// and the time interval dt.
+// Inputs: Pointer to entity and time interval
+// Outputs nothing
+void update_velocity(Entity *e, vec2 force, int32_t dt) {
+	e->posX += force.x * dt / e->mass;
+	e->posY += force.y * dt / e->mass;
+}
+
 // calc_net_grav(e, others, entity_count)
 // Calculate the net gravitational force on e by others
 // Inputs: Entity *e - pointer to entity on which the forces are working
