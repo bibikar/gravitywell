@@ -45,12 +45,11 @@ typedef struct entity_struct {
 // disp_vec (array of length 2)
 // Output: array of length 2 giving force in X and Y dirs.
 // REMEMBER TO FREE THE ARRAY! Otherwise these things will just fill the entire RAM
-int32_t *calc_grav_raw(int32_t mass1, int32_t mass2, int32_t dispX, int32_t dispY) {
-	int32_t *force_arr = malloc(sizeof(int32_t) * 2);
-	*force_arr = mass1 * mass2 / dispX / dispX * GRAVITATIONAL_CONSTANT / GRAVITATIONAL_DIVISOR;
-	*(force_arr+1) = mass1 * mass2 / dispY / dispY * GRAVITATIONAL_CONSTANT / GRAVITATIONAL_DIVISOR;
-	
-	return force_arr;
+vec2 calc_grav_raw(int32_t mass1, int32_t mass2, int32_t dispX, int32_t dispY) {
+	int32_t x = mass1 * mass2 / dispX / dispX * GRAVITATIONAL_CONSTANT / GRAVITATIONAL_DIVISOR;
+	int32_t y = mass1 * mass2 / dispY / dispY * GRAVITATIONAL_CONSTANT / GRAVITATIONAL_DIVISOR;
+	vec2 force = {x, y};
+	return force;
 }
 
 // calc_grav(e1, e2)
@@ -58,7 +57,7 @@ int32_t *calc_grav_raw(int32_t mass1, int32_t mass2, int32_t dispX, int32_t disp
 // Inputs: Pointers to two entities
 // Output: array of length 2 giving force in X and Y dirs.
 // REMEMBER TO FREE THE ARRAY! Otherwise these things will just fill the entire RAM
-int32_t *calc_grav(Entity *e1, Entity *e2) {
+vec2 calc_grav(Entity *e1, Entity *e2) {
 	return calc_grav_raw(e1->mass, e2->mass, e1->posX - e2->posX, e1->posY - e2->posY);
 }
 
@@ -79,14 +78,12 @@ void update_position(Entity *e, int32_t dt) {
 // int32_t entity_count - length of the array of entities
 // Output: array of length 2 giving force in X and Y dirs.
 // REMEMBER TO FREE THE ARRAY! Otherwise these things will just fill the entire RAM
-int32_t *calc_net_grav(Entity *e, Entity *others, int32_t entity_count) {
-	int32_t *force_arr = malloc(sizeof(int32_t) * 2);
-	int i;
+vec2 calc_net_grav(Entity *e, Entity *others, uint32_t entity_count) {
+	vec2 net_force = {0, 0};
 	for (int i = 0; i < entity_count; i++) {
-		int32_t *force = calc_grav(e, others+i);
-		*force_arr += *force;
-		*(force_arr+1) += *(force+1);
-		free(force);
+		vec2 force = calc_grav(e, others+i);
+		net_force.x += force.x;
+		net_force.y += force.y;
 	}
-	return force_arr;
+	return net_force;
 }
