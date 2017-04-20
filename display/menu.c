@@ -21,7 +21,7 @@ static const uint8_t main_menu_selection_rows[3] = {8,9,10};
 // Help screens
 #define HELP_SCREEN_COUNT 3
 static char help_strings[][100] = {
-	"This is page 1\nof the help file",
+	"This is page 1\nof the help file\nthe aim is to\nnavigate through the\nfield and avoid\nthe asteriods",
 	"This is page 2\nof the help file",
 	"This is the last\nhelp page, I think."
 };
@@ -99,6 +99,7 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 				// Fill the screen with a blank color, but let's make it somewhat more interesting than just a color like that
 				ST7735_FillScreen(ST7735_Color565(help_screen_index*HELP_COLOR_MULTIPLIER_R, help_screen_index*HELP_COLOR_MULTIPLIER_G, help_screen_index*HELP_COLOR_MULTIPLIER_B));
 				// Tell the user we're in the help menu
+				ST7735_SetCursor(2, 15);
 				ST7735_OutString("Help (");
 				LCD_OutDec(help_screen_index+1);
 				ST7735_OutChar('/');
