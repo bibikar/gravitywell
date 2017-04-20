@@ -57,6 +57,7 @@
 #include "input/ADC.h"
 #include "display/menu.h"
 #include "input/portf.h"
+#include "game/game.h"
 
 
 void DisableInterrupts(void); // Disable interrupts
@@ -74,6 +75,8 @@ int main(void){
   portf_init();
 	uint8_t flag = MENU_MAIN;
 	while(1){
+		if(flag==1)
+			game_test();
 		flag = show_menu(flag,0);	//second number is the score		
   }
 

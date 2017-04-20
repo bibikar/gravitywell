@@ -57,7 +57,7 @@ void queue_offer(Queue *q, uint32_t data) {
 }
 
 void queue_put(Queue *q, uint32_t data) {
-	return queue_offer(q, data);
+	queue_offer(q, data);
 }
 
 // *********** queue_poll **********

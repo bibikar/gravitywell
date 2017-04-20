@@ -7,8 +7,8 @@
 // We have done some #defines in the menu.h file.
 #include "menu.h"
 
-#define LEFT_BUTTON 0x02
-#define RIGHT_BUTTON 0x01
+#define LEFT_BUTTON 0x01
+#define RIGHT_BUTTON 0x02
 
 #define HELP_COLOR_MULTIPLIER_R 4
 #define HELP_COLOR_MULTIPLIER_G 8
@@ -83,6 +83,10 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			ST7735_OutString("Help");
 			ST7735_SetCursor(8, 10);
 			ST7735_OutString("Exit");
+			ST7735_SetCursor(13,14);
+			ST7735_OutString("Select");
+			ST7735_SetCursor(2,14);
+			ST7735_OutString("Next");
 
 			uint8_t main_menu_selection = show_main_menu_selector(main_menu_selection_rows, MAIN_MENU_SELECTION_ROW_COUNT);
 
@@ -99,7 +103,7 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 				// Fill the screen with a blank color, but let's make it somewhat more interesting than just a color like that
 				ST7735_FillScreen(ST7735_Color565(help_screen_index*HELP_COLOR_MULTIPLIER_R, help_screen_index*HELP_COLOR_MULTIPLIER_G, help_screen_index*HELP_COLOR_MULTIPLIER_B));
 				// Tell the user we're in the help menu
-				ST7735_SetCursor(2, 15);
+				ST7735_SetCursor(0,0);
 				ST7735_OutString("Help (");
 				LCD_OutDec(help_screen_index+1);
 				ST7735_OutChar('/');
@@ -112,6 +116,14 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 				ST7735_SetCursor(0,2);
 				this_help = help_strings[help_screen_index];
 				ST7735_OutString(this_help);
+				ST7735_SetCursor(15,14);
+				if(help_screen_index!=2)
+					ST7735_OutString("Next");
+				else
+					ST7735_OutString("Exit");
+				if(help_screen_index!=0)
+				{ST7735_SetCursor(2,14);
+				ST7735_OutString("Prev");}
 				// Make sure the button is released before continuing
 				while (menu_get_button_status() == 0) {}
 				// Make sure some button is pressed before continuing.
