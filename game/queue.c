@@ -83,19 +83,19 @@ int32_t queue_poll(Queue *q)
 	return retval;
 }
 
-uint32_t queue_get(Queue q) {
+uint32_t queue_get(Queue *q) {
 	return queue_poll(q);
 }
 
-int queue_fr(Queue q) {
+int queue_fr(Queue *q) {
 	return q->fr;
 }
 
-int queue_capacity(Queue q) {
+int queue_capacity(Queue *q) {
 	return q->capacity;
 }
 
-int queue_size(Queue q) {
+int queue_size(Queue *q) {
 	return q->capacity - q->fr;
 }
 
