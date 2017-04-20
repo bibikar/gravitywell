@@ -53,7 +53,7 @@ void queue_offer(Queue *q, uint32_t data) {
 	(q->fr)--;
 	EnableInterrupts();
 	// Actually put the data in the queue.
-	(q->arr)[queue_end] = data;
+	*(q->arr + queue_end) = data;
 }
 
 void queue_put(Queue *q, uint32_t data) {
@@ -70,7 +70,7 @@ int32_t queue_poll(Queue *q)
 	// If the queue is empty, return failure
 	if (q->fr == q->capacity) return -1;
 	// Actually get data from the queue
-	uint32_t retval = q->arr[queue_begin];
+	uint32_t retval = *(q->arr + queue_begin);
 	// If the queue start is the last element, set it to zero
 	if (q->begin == q->capacity - 1) q->begin = 0;
 	// Otherwise, increment it.
