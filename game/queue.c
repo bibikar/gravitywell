@@ -1,0 +1,100 @@
+// FiFo.c
+// Runs on LM4F120/TM4C123
+// Provide functions that implement the Software FiFo Buffer
+// Last Modified: 4/10/2017 
+// Student names: Sneha Pendharkar, Sameer Bibikar
+// Last modification date: change this to the last modification date or look very silly
+
+#include <stdint.h>
+#include <stdlib.h>
+#include "../tm4c123gh6pm.h"
+void DisableInterrupts(void); // Disable interrupts
+void EnableInterrupts(void);  // Enable interrupts
+
+
+struct queue_struct {
+	uint32_t *arr;
+	int begin; // The beginning of the queue (inclusive)
+	int end; // The end of the queue (exclusive)
+	int free;
+	int capacity;
+};
+
+typedef struct queue_struct Queue;
+
+
+// *********** FiFo_Init**********
+// Initializes a software FIFO of a
+// fixed size and sets up indexes for
+// put and get operations
+Queue *queue_init(int capacity) {
+	Queue *q = malloc(sizeof(struct queue_struct));
+	q->arr = malloc(sizeof(uint32_t) * capacity);
+	q->begin = 0;
+	q->end = -1;
+	q->free = capacity;
+	q->capacity = capacity;
+}
+
+// *********** queue_offer **********
+// Adds an element to the FIFO
+// Input: Data to be inserted
+// Won't insert if there isn't any space
+void queue_offer(Queue q, uint32_t data) {
+	// If we have no space left in the queue return failure
+	if (q->free == 0) return;
+	// If the queue end is the last element set it to zero
+	if (q->end == q->capacity - 1) q->end = 0;
+	// Otherwise increment it.
+	else (q->end)++;
+	// Keep track of free space, decrement
+	DisableInterrupts();
+	(q->free)--;
+	EnableInterrupts();
+	// Actually put the data in the queue.
+	(q->arr)[queue_end] = data;
+}
+
+void queue_put(Queue q, uint32_t data) {
+	return queue_offer(q, data);
+}
+
+// *********** queue_poll **********
+// Gets an element from the FIFO
+// Input: Pointer to a character that will get the character read from the buffer
+// Output: 1 for success and 0 for failure
+//         failure is when the buffer is empty
+uint32_t queue_poll(Queue q)
+{
+	// If the queue is empty, return failure
+	if (q->free == q->capacity) return;
+	// Actually get data from the queue
+	uint32_t retval = q->arr[queue_begin];
+	// If the queue start is the last element, set it to zero
+	if (q->begin == q->capacity - 1) q->begin = 0;
+	// Otherwise, increment it.
+	else (q->begin)++;
+	// Keep track of free space, increment
+	DisableInterrupts();
+	(q->free)++;
+	EnableInterrupts();
+	// Return success
+	return retval;
+}
+
+uint32_t queue_get(Queue q) {
+	return queue_poll(q);
+}
+
+int queue_free(Queue q) {
+	return q->free;
+}
+
+int queue_capacity(Queue q) {
+	return q->capacity;
+}
+
+int queue_size(Queue q) {
+	return q->capacity - q->free;
+}
+
