@@ -5,7 +5,6 @@
 
 
 #include <stdint.h>
-#include <stdlib.h>
 #include "physics.h"
 
 // This isn't the real-world gravitational constant.
