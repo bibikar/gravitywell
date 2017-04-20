@@ -51,6 +51,18 @@ void drawing_rect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t color) {
 	ST7735_FillRect(xStart, yStart, xEnd-xStart, yEnd-yStart, color);
 } 
 
+// Draw the outline of a rectangle using the ST7735 driver.
+// Inputs: int x - X coordinate of top left corner
+// int y - Y coordinate of top left corner
+// int w - width of rectangle
+// int h - height of rectangle
+void drawing_rect_outline(int16_t x, int16_t y, int16_t w, int16_t h, int16_t color) {
+	ST7735_DrawFastVLine(x, y, h, color);
+	ST7735_DrawFastVLine(x+w, y, h, color);
+	ST7735_DrawFastHLine(x, y, w, color);
+	ST7735_DrawFastHLine(x, y+h, w, color);
+}
+
 // Draw a shooting star at (x, y).
 // To erase, just draw a rectangle over the old position.
 void drawing_star(int16_t x, int16_t y) {
