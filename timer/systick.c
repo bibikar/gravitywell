@@ -4,7 +4,7 @@
 #include "../tm4c123gh6pm.h"
 #include<stdint.h>
 
-uint64_t ms;
+volatile uint32_t ms;
 
 // Initialize SysTick with the given reload value
 // If enable_interrupts is nonzero, enable interrupts.

@@ -36,7 +36,6 @@ uint8_t menu_get_button_status() {
 }
 
 uint8_t show_main_menu_selector(const uint8_t rows[], const uint8_t row_count) {
-	uint8_t button_status = 0;
 	uint8_t current_row = 0;
 	while (menu_get_button_status() != RIGHT_BUTTON) {
 		ST7735_SetCursor(0, rows[current_row]);
@@ -154,7 +153,7 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			ST7735_SetCursor(0,14);
 			ST7735_OutString("   Press any key\n   to return...");
 			// Wait until some button is pressed.
-			while (menu_get_button_status == 0) {}
+			while (menu_get_button_status() == 0) {}
 			return MENU_MAIN;
 		case MENU_NEXT_LEVEL:
 			ST7735_FillScreen(ST7735_Color565(0,20,0));
@@ -165,7 +164,7 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			ST7735_SetCursor(0,14);
 			ST7735_OutString("   Press any key\n   to continue...");
 			// Wait until some button is pressed.
-			while (menu_get_button_status == 0) {}
+			while (menu_get_button_status() == 0) {}
 			return GAME_BEGIN + data; // tell the main program we want to start the game with level specified by data.
 		case MENU_ERROR:
 		default:

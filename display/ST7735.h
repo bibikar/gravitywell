@@ -90,6 +90,14 @@ void ST7735_InitB(void);
 // Output: none
 void ST7735_InitR(enum initRFlags option);
 
+// Set the address window (region of RAM to modify)
+// We need this for efficient treatment of the buffer
+void ST7735_SetWindow(uint8_t, uint8_t, uint8_t, uint8_t);
+
+// Push a color.
+// Same reason as set window
+void ST7735_PushColor(uint16_t color);
+
 
 //------------ST7735_DrawPixel------------
 // Color the pixel at the given coordinates with the given color.

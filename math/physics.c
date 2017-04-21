@@ -10,7 +10,7 @@
 // This isn't the real-world gravitational constant.
 // It's just something we can scale all gravity by to make the numbers
 // work for the display.
-#define GRAVITATIONAL_CONSTANT 10
+#define GRAVITATIONAL_CONSTANT 1
 #define GRAVITATIONAL_DIVISOR 1
 
 // The entity struct.

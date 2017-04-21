@@ -12,8 +12,8 @@ TARGET = main
 # MCU: part number to build for
 MCU = TM4C123GH6PM
 # SOURCES: list of input source sources
-SOURCES = main.c startup_gcc.c display/ST7735.c display/drawing.c display/menu.c game/game.c game/queue.c game/stack.c input/ADC.c input/portf.c math/physics.c sound/dac.c sound/sound.c sound/sound_lookup.c timer/systick.c timer/Timer0.c timer/Timer1.c TExaS.c
-ASM_SOURCES = display/LCD.gcc.s display/print.gcc.s math/random.gcc.s 
+SOURCES = main.c startup_gcc.c display/ST7735.c display/drawing.c display/menu.c game/game.c game/queue.c game/stack.c input/ADC.c input/portf.c math/physics.c sound/dac.c sound/sound.c sound/sound_lookup.c timer/systick.c timer/Timer0.c timer/Timer1.c TExaS.c display/buffer.c
+ASM_SOURCES = display/LCD.gcc.s display/print.gcc.s math/random.gcc.s critical.gcc.s
 SOURCE_DIRS = display game input math sound timer
 # INCLUDES: list of includes, by default, use Includes directory
 INCLUDES = -IInclude
@@ -54,10 +54,8 @@ OBJECTS = $(addprefix $(OUTDIR)/,$(notdir $(SOURCES:.c=.o)))
 # default: build bin
 all: $(OUTDIR)/$(TARGET).bin
 
-$(OUTDIR)/%.gcc.o: math/%.gcc.s | $(OUTDIR)
-	$(AS) -o $@ $< $(CFLAGS)
-
-$(OUTDIR)/%.gcc.o: display/%.gcc.s | $(OUTDIR)
+vpath %.gcc.s $(SOURCE_DIRS)
+$(OUTDIR)/%.gcc.o: %.gcc.s | $(OUTDIR)
 	$(AS) -o $@ $< $(CFLAGS)
 
 vpath %.c $(SOURCE_DIRS) 
@@ -76,5 +74,17 @@ $(OUTDIR):
 
 clean:
 	-$(RM) $(OUTDIR)/*
+
+flash:
+	lm4flash -v $(OUTDIR)/$(TARGET).bin
+
+#
+# The rule to rebuild the project and debug it with Nemiver.
+#
+debug: clean
+debug: CFLAGS+=-g -D DEBUG
+debug: all
+debug:
+	./debug_nemiver.sh
 
 .PHONY: all clean
