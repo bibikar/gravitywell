@@ -25,6 +25,14 @@ void systick_stop() {
 	NVIC_ST_CTRL_R = 0;	//disables systick
 }
 
+void systick_suspend() {
+	NVIC_ST_CTRL_R = 0x0005;
+}
+
+void systick_resume() {
+	NVIC_ST_CTRL_R = 0x0007;
+}
+
 int systick_get()
 {
 	return NVIC_ST_CURRENT_R;
@@ -36,6 +44,5 @@ int systick_getms()
 }
 // SysTick ISR
 void SysTick_Handler(void) {
-	// TODO fill this with something
 	ms++;
 }
