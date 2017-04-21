@@ -3,6 +3,12 @@
 // Draw primitives by directly referencing the ST7735 driver
 // Author: Sameer Bibikar
 
+// Get the maximum of two integers.
+int drawing_max(int, int);
+
+// Get the minimum of two integers.
+int drawing_min(int, int);
+
 // Draw a circle using the ST7735 driver.
 // The center of the circle is given by (x, y), and its radius by r.
 // The color must be gotten from ST7735_Color565.

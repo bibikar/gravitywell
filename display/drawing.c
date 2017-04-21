@@ -7,13 +7,13 @@
 #include "ST7735.h"
 
 // Get the maximum of two integers.
-static int drawing_max(int a, int b) {
+int drawing_max(int a, int b) {
 	if (a >= b) return a;
 	return b;
 }
 
 // Get the minimum of two integers.
-static int drawing_min(int a, int b) {
+int drawing_min(int a, int b) {
 	if (a < b) return a;
 	return b;
 }
