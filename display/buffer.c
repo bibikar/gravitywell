@@ -124,3 +124,6 @@ void buffer_star(int16_t x, int16_t y) {
 	}
 }
 
+void buffer_write() {
+
+}
