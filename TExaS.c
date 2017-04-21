@@ -67,7 +67,6 @@ typedef struct portdata  {
   unsigned long OutputPort;   // pointer to 40 byte character string
 } PORT_DATA;
 PORT_DATA TExaS_Ports;        // in RAM, set by user in DLL
-enum DisplayType Display;// value is not relevant
 const unsigned char NoInputMsg[40] = "There is no grader for Lab 15";
 const unsigned char OutputPortMsg0[40] = "Simulated Nokia5110 on PA1-0";
 const unsigned char OutputPortMsg1[40] = "Real Nokia5110 on PA7-2+Scope on PA1-0";
@@ -251,71 +250,8 @@ unsigned long ScopeCount; // one buffer is 512 points
 // This needs to be called once
 // Inputs: display system used to output the results
 // Outputs: none
-void TExaS_Init(enum DisplayType display){volatile unsigned long delay;
+void TExaS_Init(){volatile unsigned long delay;
   PLL_Init();     // ADC needs PLL on to run, 80 MHz
-  SYSCTL_RCGCTIMER_R |= 0x20;      // 0) activate timer5
-  SetCourse("EE319K");
-  OUT(ActionMsg,IntroMsg);
-  OUT(IntroMsg,BlankMsg);
-  OUT(OKMsg,BlankMsg);
-  OUT(ErrMsg,BlankMsg);
-  LastMode = 0;
-  TExaS.Mode = 0; // bit 0 set by user in DLL window
-  TExaS_Test = 0; // goes from 0 to NUMTESTS-1
-  DelayBetweenTests = 0; // 0 means no sleeping
-  ADCnum = 0;     // index into oscilloscope buffer
-  bFlag = 0;      // true at first interrupt of a test
-  TExaS_Period = 800000;  // 10ms
-  TExaS.Lab = LABNUM;     // fixed
-  TExaS.Grade = 0;
-  TExaS_Meter.Voltage = 0;
-  Display = display;
-  ScopeMode = 0;
-  ScopeCount = 0;
-  TExaS_Ports.InputPort = (unsigned long) NoInputMsg;  // no grader
-  if(Display == UART0_Emulate_Nokia5110_NoScope){
-    TExaS_Ports.OutputPort = (unsigned long) OutputPortMsg0;
-    UART0_Init();                    // UART0 is connected to TExaSdisplay
-  }else if(Display == SSI0_Real_Nokia5110_Scope){
-    TExaS_Ports.OutputPort = (unsigned long) OutputPortMsg1;
-    ScopeMode = 1;
-    SYSCTL_RCGCTIMER_R |= 0x10;      // 0) activate timer4
-    UART0_Init();                    // UART0 is connected to TExaSdisplay
-    TIMER4_CTL_R = 0x00000000;       // 1) disable timer4A during setup
-    TIMER4_CFG_R = 0x00000000;       // 2) configure for 32-bit mode
-    TIMER4_TAMR_R = 0x00000002;      // 3) configure for periodic mode, default down-count settings
-    TIMER4_TAILR_R = 7999;           // 4) 100us reload value
-    TIMER4_TAPR_R = 0;               // 5) bus clock resolution
-    TIMER4_ICR_R = 0x00000001;       // 6) clear timer5A timeout flag
-    TIMER4_IMR_R = 0x00000001;       // 7) arm timeout interrupt
-    NVIC_PRI17_R = (NVIC_PRI17_R&0xFF00FFFF)|0x00E00000; // 8) priority 7
-// interrupts enabled in the main program after all devices initialized
-// vector number 86, interrupt number 70
-    NVIC_EN2_R = 0x00000040;         // 9) enable interrupt 70 in NVIC
-    TIMER4_CTL_R = 0x00000001;       // 10) enable timer4A
-  }else if(Display == SSI0_Real_Nokia5110_NoScope){
-    TExaS_Ports.OutputPort = (unsigned long) OutputPortMsg2;
-  }else{
-    TExaS_Ports.OutputPort = (unsigned long) OutputPortMsg3;
-  }
-    
-  SetCode("        ");
-
-  TIMER5_CTL_R = 0x00000000;       // 1) disable timer5A during setup
-  TIMER5_CFG_R = 0x00000000;       // 2) configure for 32-bit mode
-  TIMER5_TAMR_R = 0x00000002;      // 3) configure for periodic mode, default down-count settings
-  TIMER5_TAILR_R = TExaS_Period-1; // 4) reload value
-  TIMER5_TAPR_R = 0;               // 5) bus clock resolution
-  TIMER5_ICR_R = 0x00000001;       // 6) clear timer5A timeout flag
-  TIMER5_IMR_R = 0x00000001;       // 7) arm timeout interrupt
-  NVIC_PRI23_R = (NVIC_PRI23_R&0xFFFFFF00)|0x00000040; // 8) priority 2
-// interrupts enabled in the main program after all devices initialized
-// vector number 108, interrupt number 92
-  NVIC_EN2_R = 0x10000000;         // 9) enable interrupt 92 in NVIC
-  TIMER5_CTL_R = 0x00000001;       // 10) enable timer5A
-
-  ADC1_Init();     // called after PLL on
-  OUT(IntroMsg,InitializedMsg);
 }
 
 void StopTimer4(void){

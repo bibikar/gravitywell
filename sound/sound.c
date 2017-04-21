@@ -1139,32 +1139,32 @@ const uint8_t highpitch[1802] = {
 
 void Sound_Init(void){
 // write this
-};
+}
 void Sound_Play(const uint8_t *pt, uint32_t count){
 // write this
-};
+}
 void Sound_Shoot(void){
 // write this
-};
+}
 void Sound_Killed(void){
 // write this
-};
+}
 void Sound_Explosion(void){
 // write this
-};
+}
 
 void Sound_Fastinvader1(void){
 // write this
-};
+}
 void Sound_Fastinvader2(void){
 // write this
-};
+}
 void Sound_Fastinvader3(void){
 // write this
-};
+}
 void Sound_Fastinvader4(void){
 // write this
-};
+}
 void Sound_Highpitch(void){
 // write this
-};
+}

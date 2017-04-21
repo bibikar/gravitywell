@@ -52,7 +52,7 @@
 #include <stdint.h>
 #include "tm4c123gh6pm.h"
 #include "display/ST7735.h"
-#include "math/Random.h"
+#include "math/random.h"
 #include "TExaS.h"
 #include "input/ADC.h"
 #include "display/menu.h"
@@ -68,7 +68,7 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 
 int main(void){
   TExaS_Init();  // set system clock to 80 MHz
-  Random_Init(1);
+  //Random_Init(1);
 
   Output_Init();
   ST7735_FillScreen(0x0000);            // set screen to black

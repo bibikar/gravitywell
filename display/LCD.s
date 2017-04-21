@@ -29,12 +29,12 @@ SSI_SR_RNE              EQU   0x00000004  ; SSI Receive FIFO Not Empty
 SSI_SR_BSY              EQU   0x00000010  ; SSI Busy Bit
 SSI_SR_TNF              EQU   0x00000002  ; SSI Transmit FIFO Not Full
 
-      EXPORT   writecommand
-      EXPORT   writedata
+EXPORT   writecommand
+EXPORT   writedata
 
-      AREA    |.text|, CODE, READONLY, ALIGN=2
-      THUMB
-      ALIGN
+AREA    |.text|, CODE, READONLY, ALIGN=2
+THUMB
+ALIGN
 
 ; The Data/Command pin must be valid when the eighth bit is
 ; sent.  The SSI module has hardware input and output FIFOs
@@ -58,14 +58,13 @@ SSI_SR_TNF              EQU   0x00000002  ; SSI Transmit FIFO Not Full
 ; Input: R0  8-bit command to transmit
 ; Output: none
 ; Assumes: SSI0 and port A have already been initialized and enabled
-writecommand
 ;1) Read SSI0_SR_R and check bit 4, 
 ;2) If bit 4 is high, loop back to step 1 (wait for BUSY bit to be low)
 ;3) Clear D/C=PA6 to zero
 ;4) Write the command to SSI0_DR_R
 ;5) Read SSI0_SR_R and check bit 4, 
 ;6) If bit 4 is high, loop back to step 5 (wait for BUSY bit to be low)
-	LDR R1,=SSI0_SR_R ; get address of SSI0_SR_R in R1
+writecommand	LDR R1,=SSI0_SR_R ; get address of SSI0_SR_R in R1
 bsyw1	LDR R2,[R1] ; get value of SSI0_SR_R in R2
 	ANDS R2,#SSI_SR_BSY ; mask SSI0_SR_R with bit 4
 	BNE bsyw1 ; if busy bit is 1, go back to bsyw1 and keep checking
@@ -85,12 +84,11 @@ bsyw2	LDR R2,[R1] ; get value of it in R2
 ; Input: R0  8-bit data to transmit
 ; Output: none
 ; Assumes: SSI0 and port A have already been initialized and enabled
-writedata
 ;1) Read SSI0_SR_R and check bit 1, 
 ;2) If bit 1 is low loop back to step 1 (wait for TNF bit to be high)
 ;3) Set D/C=PA6 to one
 ;4) Write the 8-bit data to SSI0_DR_R
-	PUSH {R1, R2, R3, LR}
+writedata	PUSH {R1, R2, R3, LR}
 loop
 	LDR R1, =SSI0_SR_R
 	LDR R1, [R1]	;R2 has the data of SSIO_SR_R
@@ -125,5 +123,5 @@ loop
 ; MIT license, all text above must be included in any redistribution
 ;****************************************************
 
-    ALIGN                           ; make sure the end of this section is aligned
-    END                             ; end of file
+ALIGN                           ; make sure the end of this section is aligned
+END                             ; end of file
