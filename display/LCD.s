@@ -29,12 +29,12 @@ SSI_SR_RNE              EQU   0x00000004  ; SSI Receive FIFO Not Empty
 SSI_SR_BSY              EQU   0x00000010  ; SSI Busy Bit
 SSI_SR_TNF              EQU   0x00000002  ; SSI Transmit FIFO Not Full
 
-EXPORT   writecommand
-EXPORT   writedata
+	EXPORT   writecommand
+	EXPORT   writedata
 
-AREA    |.text|, CODE, READONLY, ALIGN=2
-THUMB
-ALIGN
+	AREA    |.text|, CODE, READONLY, ALIGN=2
+	THUMB
+	ALIGN
 
 ; The Data/Command pin must be valid when the eighth bit is
 ; sent.  The SSI module has hardware input and output FIFOs
