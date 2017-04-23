@@ -2,8 +2,6 @@
 #include "ST7735.h"
 #include "drawing.h"
 
-#include "../input/portf.h"
-
 #define DISPLAY_WIDTH 128
 #define DISPLAY_HEIGHT 160
 #define BUFFER_WIDTH (DISPLAY_WIDTH+1)
@@ -14,30 +12,17 @@
 // per pixel, we don't have enough space in RAM for that, so instead,
 // we will store 8 bits per pixel at the cost of reduced color
 // depth.
-uint8_t buffer[BUFFER_WIDTH*BUFFER_HEIGHT];
-// All the pixels are just stored consecutively.
-// To get a pixel at (x, y), the formula is
-// buffer[x + y*DISPLAY_WIDTH].
+uint8_t buffer[BUFFER_WIDTH][BUFFER_HEIGHT];
 
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 
 void buffer_clear() {
-	volatile uint8_t i, j, k;
-//	DisableInterrupts();
-	for (i = 0; i <= DISPLAY_WIDTH; ) {
-		portf_toggle(1);
-		for (j = 0; j <= DISPLAY_HEIGHT;) {
-			portf_toggle(2);
-			k = j*BUFFER_WIDTH;
-			k += i;
-			j++;
-			buffer[k] = 0;
-			portf_toggle(3);
+	for (uint8_t i = 0; i <= DISPLAY_WIDTH; i++) {
+		for (uint8_t j = 0; j <= DISPLAY_HEIGHT; j++) {
+			buffer[i][j] = 0;
 		}
-		i++;
 	}
-//	EnableInterrupts();
 }
 
 // Pack the three color values into one.
@@ -73,13 +58,11 @@ uint16_t buffer_displaycolor(uint8_t color) {
 }
 
 void buffer_fill(uint8_t color) {
-//	DisableInterrupts();
-	for (volatile int i = 0; i <= DISPLAY_WIDTH; i++) {
-		for (volatile int j = 0; j <= DISPLAY_HEIGHT; j++) {
-			buffer[i+j*BUFFER_WIDTH] = color;
+	for (uint8_t i = 0; i <= DISPLAY_WIDTH; i++) {
+		for (uint8_t j = 0; j <= DISPLAY_HEIGHT; j++) {
+			buffer[i][j] = color;
 		}
 	}
-//	EnableInterrupts();
 }
 
 // Draw a circle into the buffer.
@@ -88,14 +71,14 @@ void buffer_fill(uint8_t color) {
 // int y - the Y coordinate of the center of the circle
 // int r - the radius of the circle
 void buffer_circle(int16_t x, int16_t y, int16_t r, uint8_t color) {
-	int i = drawing_max(x-r, 0);
+	int xStart = drawing_max(x-r, 0);
 	int xEnd = drawing_min(x+r, DISPLAY_WIDTH);
-	int j = drawing_max(y-r, 0);
+	int yStart = drawing_max(y-r, 0);
 	int yEnd = drawing_min(y+r, DISPLAY_HEIGHT);
-	for (; i < xEnd; i++) {
-		for (; j < yEnd; j++) {
+	for (int i = xStart; i < xEnd; i++) {
+		for (int j = yStart; j < yEnd; j++) {
 			if ((i-x)*(i-x)+(j-y)*(j-y) <= r*r) {
-				buffer[i+j*DISPLAY_WIDTH] = color;
+				buffer[i][j] = color;
 			}
 		}
 	}
@@ -108,13 +91,13 @@ void buffer_circle(int16_t x, int16_t y, int16_t r, uint8_t color) {
 // int w - width of rectangle
 // int h - height of rectangle
 void buffer_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t color) {
-	int i = drawing_max(x, 0);
-	int xEnd = drawing_min(x+w, DISPLAY_WIDTH);
-	int j = drawing_max(y, 0);
-	int yEnd = drawing_min(y+h, DISPLAY_HEIGHT);
+	uint8_t i = drawing_max(x, 0);
+	uint8_t xEnd = drawing_min(x+w, DISPLAY_WIDTH);
+	uint8_t j = drawing_max(y, 0);
+	uint8_t yEnd = drawing_min(y+h, DISPLAY_HEIGHT);
 	for (; i <= xEnd; i++) {
 		for (; j <= yEnd; j++) {
-			buffer[i+j*DISPLAY_WIDTH] = color;
+			buffer[i][j] = color;
 		}
 	}
 } 
@@ -125,18 +108,18 @@ void buffer_rect(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t color) {
 // int w - width of rectangle
 // int h - height of rectangle
 void buffer_rect_outline(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t color) {
-	int xStart = drawing_max(x, 0);
-	int xEnd = drawing_min(x+w, DISPLAY_WIDTH);
-	int yStart = drawing_max(y, 0);
-	int yEnd = drawing_min(y+h, DISPLAY_HEIGHT);
-	for (int i = xStart; i < xEnd; i++) {
-		buffer[i+yStart*DISPLAY_WIDTH] = color;
-		buffer[i+yEnd*DISPLAY_WIDTH] = color;
+	uint8_t xStart = drawing_max(x, 0);
+	uint8_t xEnd = drawing_min(x+w, DISPLAY_WIDTH);
+	uint8_t yStart = drawing_max(y, 0);
+	uint8_t yEnd = drawing_min(y+h, DISPLAY_HEIGHT);
+	for (uint8_t i = xStart; i < xEnd; i++) {
+		buffer[i][yStart] = color;
+		buffer[i][yEnd] = color;
 	}
 
-	for (int j = yStart; j < yEnd; j++) {
-		buffer[xStart+j*DISPLAY_WIDTH] = color;
-		buffer[xEnd+j*DISPLAY_WIDTH] = color;
+	for (uint8_t j = yStart; j < yEnd; j++) {
+		buffer[xStart][j] = color;
+		buffer[xEnd][j] = color;
 	}
 }
 
@@ -147,20 +130,16 @@ void buffer_star(int16_t x, int16_t y) {
 	if (y + 5 > ST7735_TFTHEIGHT || y < 0) return;
 	uint8_t grey_value = 32;
 	for (int i = 0; i < 5; i++) {
-		buffer[x+(y+i)*DISPLAY_WIDTH] = buffer_color(grey_value, grey_value, grey_value);
+		buffer[x][y+i] = buffer_color(grey_value, grey_value, grey_value);
 		grey_value += 32;
 	}
 }
 
 void buffer_write() {
-//	DisableInterrupts();
 	ST7735_SetWindow(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-	for (volatile int i = DISPLAY_HEIGHT; i > 0;) {
-		for (volatile int j = DISPLAY_WIDTH; j > 0;) {
-			ST7735_PushColor(buffer_displaycolor(buffer[j+i*DISPLAY_WIDTH]));
-			j--;
+	for (uint8_t i = 0; i < DISPLAY_HEIGHT; i++) {
+		for (uint8_t j = 0; j < DISPLAY_WIDTH; j++) {
+			ST7735_PushColor(buffer_displaycolor(buffer[j][i]));
 		}
-		i--;
 	}
-//	EnableInterrupts();
 }
