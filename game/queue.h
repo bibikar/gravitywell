@@ -8,11 +8,21 @@
 
 #include <stdint.h>
 
+struct queue_struct {
+	uint32_t *arr;
+	int begin; // The beginning of the queue (inclusive)
+	int end; // The end of the queue (exclusive)
+	int fr;
+	int capacity;
+};
+
+typedef struct queue_struct Queue;
+
 // *********** FIFO_Init**********
 // Initializes a software FIFO of a
 // fixed size and sets up indexes for
 // put and get operations
-Queue *queue_init(int capacity);
+void queue_init(Queue *q, uint32_t *arr, int capacity);
 
 // *********** FIFO_Put**********
 // Adds an element to the FIFO

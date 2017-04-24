@@ -6,35 +6,24 @@
 // Last modification date: change this to the last modification date or look very silly
 
 #include <stdint.h>
-#include <stdlib.h>
 #include "../tm4c123gh6pm.h"
+#include "queue.h"
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
-
-
-struct queue_struct {
-	uint32_t *arr;
-	int begin; // The beginning of the queue (inclusive)
-	int end; // The end of the queue (exclusive)
-	int fr;
-	int capacity;
-};
-
-typedef struct queue_struct Queue;
-
 
 // *********** FiFo_Init**********
 // Initializes a software FIFO of a
 // fixed size and sets up indexes for
 // put and get operations
-Queue *queue_init(int capacity) {
-	Queue *q = malloc(sizeof(struct queue_struct));
-	q->arr = malloc(sizeof(uint32_t) * capacity);
+//
+// We cannot use malloc() so this will be allocated elsewhere.
+
+void queue_init(Queue *q, uint32_t *arr, int capacity) {
+	q->arr = arr;
 	q->begin = 0;
 	q->end = -1;
 	q->fr = capacity;
 	q->capacity = capacity;
-	return q;
 }
 
 // *********** queue_offer **********

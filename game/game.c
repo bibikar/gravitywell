@@ -1,4 +1,5 @@
 #include "game.h"
+#include "queue.h"
 #include "../input/portf.h"
 #include "../display/drawing.h"
 #include "../display/buffer.h"
@@ -7,10 +8,15 @@
 #include "../math/physics.h"
 #include "../timer/systick.h"
 
+#define EVENT_QUEUE_SIZE 8
+
 void DisableInterrupts(void);
 void EnableInterrupts(void);
 void StartCritical(void);
 void EndCritical(void);
+
+static uint32_t event_arr[EVENT_QUEUE_SIZE];
+Queue event_queue;
 
 uint8_t buffer_test() {
 	uint8_t color = 0;
@@ -22,6 +28,8 @@ uint8_t buffer_test() {
 }
 uint8_t game_test()
 {	
+	queue_init(&event_queue, event_arr, EVENT_QUEUE_SIZE);
+	portf_enable_interrupts();
 	uint32_t time, dt;
 	
 	systick_init(80000, 1);
@@ -63,5 +71,10 @@ uint8_t game_test()
 		buffer_circle(e1.posX/1000,e1.posY/1000, 5, buffer_color(255,0,0));		
 		buffer_write();
 	}
+	portf_disable_interrupts();
 	return 0;	
+}
+
+Queue *get_event_queue() {
+	return &event_queue;
 }

@@ -4,12 +4,17 @@
 
 #include <stdint.h>
 #include "../tm4c123gh6pm.h"
+#include "../game/queue.h"
+#include "../game/game.h"
+#include ";./timer/systick.h"
 
 // The switch on the left side of the board (if looking at the side with buttons)
 // is SW1 (which is PF4)
 // The switch on the other side of the board is SW2 (which is PF0.)
 // Thus, since we are using the board on the other side, the button 
 // on the right is PF4, and the button on the left is PF0.
+//
+uint32_t ms;
 
 // Initialize port F.
 // Also unlocks PF0.
@@ -47,6 +52,7 @@ void portf_toggle(uint8_t pin) {
 }
 
 void portf_enable_interrupts() {
+	ms = systick_getms();
 	GPIO_PORTF_IS_R &= ~0x11; // PF0 and PF4 is edge-sensitive
 	GPIO_PORTF_IBE_R &= ~0x11; // PF0 and PF4 are not triggered by both edges
 	GPIO_PORTF_IEV_R &= ~0x11; // PF0, PF4 falling edge event
@@ -61,14 +67,22 @@ void portf_disable_interrupts() {
 }
 
 void gpio_portf_handler() {
+	if (systick_getms() - ms < 10) {
+		GPIO_PORTF_ICR_R = 0x11;
+		ms = systick_getms();
+		return;
+		// If the button was pushed twice in 10 ms we can just ignore it.
+	}
+	Queue *event_queue = get_event_queue();
 	if (GPIO_PORTF_RIS_R & 0x01) {
-		// add PF0 to event handler
+		queue_offer(event_queue, 0);
 		// acknowledge flag on PF0:
 		GPIO_PORTF_ICR_R = 0x01;
 	}
 	if (GPIO_PORTF_RIS_R & 0x10) {
-		// add PF4 to event handler
+		queue_offer(event_queue, 4);
 		// acknowledge flag on PF4:
 		GPIO_PORTF_ICR_R = 0x10;
 	}
+	ms = systick_getms();
 }
