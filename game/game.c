@@ -22,12 +22,8 @@ uint8_t buffer_test() {
 }
 uint8_t game_test()
 {	
-	//buffer_test();
 	uint32_t time, dt;
 	
-	// If we enable interrupts here, the buffer doesn't work
-	// even if we disable interrupts around the buffer functions
-	// as we execute them below.
 	systick_init(80000, 1);
 	
 	Entity e1, e2;
@@ -52,29 +48,20 @@ uint8_t game_test()
 	while(portf_get(0)==0) { //as long as PF0 is not pressed		
 		portf_toggle(1);
 		// Calculate the force:
-		int32_t forceX, forceY;
-		calc_grav(&e1, &e2, &forceX, &forceY);
-		ST7735_SetCursor(0,0);
-		ST7735_OutString("         ");
-		ST7735_SetCursor(0,0);
-		LCD_OutDec(forceX);
-		ST7735_SetCursor(0,1);
-		ST7735_OutString("         ");
-		ST7735_SetCursor(0,1);
-		LCD_OutDec(forceY);
-
+		//int32_t forceX, forceY;
+		//calc_grav(&e1, &e2, &forceX, &forceY);
 		// Get the time elapsed, in milliseconds:
 		dt = systick_getms()-time;
 		time = systick_getms();
 		// Update the velocities:
-		update_velocity(&e1, forceX, forceY, dt);
+		//update_velocity(&e1, forceX, forceY, dt);
 		// Erase old objects:
 		buffer_circle(e1.posX/1000,e1.posY/1000, 5, 0);	//erase the previous circle
 		//update the position
 		update_position(&e1, dt);
 		// Draw new objects:
 		buffer_circle(e1.posX/1000,e1.posY/1000, 5, buffer_color(255,0,0));		
-//		buffer_write();
+		buffer_write();
 	}
 	return 0;	
 }

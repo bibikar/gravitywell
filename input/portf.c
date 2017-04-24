@@ -46,3 +46,29 @@ void portf_toggle(uint8_t pin) {
 	GPIO_PORTF_DATA_R ^= (1 << pin);
 }
 
+void portf_enable_interrupts() {
+	GPIO_PORTF_IS_R &= ~0x11; // PF0 and PF4 is edge-sensitive
+	GPIO_PORTF_IBE_R &= ~0x11; // PF0 and PF4 are not triggered by both edges
+	GPIO_PORTF_IEV_R &= ~0x11; // PF0, PF4 falling edge event
+	GPIO_PORTF_ICR_R = 0x11; // clear flag0, flag4.
+	GPIO_PORTF_IM_R |= 0x11; // arm interrupt on PF0, PF4.
+	NVIC_PRI7_R = (NVIC_PRI7_R & 0xFF00FFFF) | 0x00A00000; // priority 5
+	NVIC_EN0_R |= 0x40000000; // enable interrupt 30 in NVIC
+}
+
+void portf_disable_interrupts() {
+	NVIC_EN0_R &= ~0x40000000; // disable interrupt 30 in NVIC
+}
+
+void gpio_portf_handler() {
+	if (GPIO_PORTF_RIS_R & 0x01) {
+		// add PF0 to event handler
+		// acknowledge flag on PF0:
+		GPIO_PORTF_ICR_R = 0x01;
+	}
+	if (GPIO_PORTF_RIS_R & 0x10) {
+		// add PF4 to event handler
+		// acknowledge flag on PF4:
+		GPIO_PORTF_ICR_R = 0x10;
+	}
+}

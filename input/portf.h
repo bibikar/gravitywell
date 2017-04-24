@@ -14,3 +14,12 @@ uint8_t portf_get(uint8_t);
 
 // Toggle pin pin.
 void portf_toggle(uint8_t);
+
+// Enable port F falling edge triggered interrupts
+void portf_enable_interrupts(void);
+
+// Disable port F falling edge triggered interrupts
+void portf_disable_interrupts(void);
+
+// Port F GPIO interrupt handler
+void gpio_portf_handler(void);
