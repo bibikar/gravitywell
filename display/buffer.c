@@ -135,6 +135,49 @@ void buffer_star(int16_t x, int16_t y) {
 	}
 }
 
+// Draw a character into the buffer.
+// Adapted from ST7735.c
+void buffer_char(int16_t x, int16_t y, char c, uint8_t color) {
+	uint8_t line; // vertical column of pixels in font
+	int32_t i, j;
+
+	// Clip character
+	if (x < 0) return;
+	if (y < 0) return;
+	if (x + 5 > ST7735_TFTWIDTH) return;
+	if (y + 8 > ST7735_TFTHEIGHT) return;
+	
+	// Actually draw the character
+	for (i = 0; i < 6; i++) {
+		// There are 6 columns
+		if (i == 5) line = 0x0; // Last column is empty
+		else line = ST7735_GetFont((c*5)+i);
+		// Now for the rows:
+		for (j = 0; j < 8; j++) {
+			if (line & 0x1) { // If the current pixel needs to be filled
+				buffer[x+i][y+j] = color;
+			} 
+			line >>= 1;
+		}
+	}
+}
+
+// Draw a string into the buffer, using buffer_char.
+void buffer_string(int16_t x, int16_t y, char *string, uint8_t color) {
+	int16_t x_orig = x;
+	while (*string) {
+		buffer_char(x, y, *string, color);
+		string++;
+		x += 6;  
+		if (x + 5 >= ST7735_TFTWIDTH || *string == '\n') {
+			y += 10; // wrap
+			x = x_orig;
+		}
+		if (y + 8 > ST7735_TFTHEIGHT) return;
+	}
+}
+
+
 void buffer_write() {
 	ST7735_SetWindow(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 	for (uint8_t i = 0; i < DISPLAY_HEIGHT; i++) {
