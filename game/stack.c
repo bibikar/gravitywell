@@ -2,7 +2,6 @@
 // Implementation of a stack
 
 #include "stack.h"
-#include<stdlib.h>
 #include<stdint.h>
 
 
@@ -11,29 +10,27 @@
 // Return the pointer to the stack
 // (this is basically an array of "pointers to void")
 
-Stack *stack_init(int capacity)
+void stack_init(Stack *s, uint16_t *arr, int capacity)
 {
-	Stack *s = malloc(sizeof(struct stack_struct));
-	s->arr = malloc(sizeof(uint32_t) * capacity);
+	s->arr = arr;
 	s->size=0;
 	s->capacity=capacity;
-	return s;
 }
 
-// Push the pointer onto the stack
-void stack_push(Stack *s, void *ptr)
+// Push the data onto the stack
+void stack_push(Stack *s, uint16_t data)
 {
-	//*ptr is the pointer to be pushed onto the stack
+	//*data is the data to be pushed onto the stack
 	if(s->size<s->capacity)	//you can only push if the size is less than the capacity
 	{
-		*(s->arr+s->size-1) = ptr;
+		*(s->arr+s->size-1) = data;
 		++s->size;	
 	}	
 }
 
-// Pop a pointer from the stack
-void *stack_pop(Stack *s)
-{	void *res;
+// Pop a data from the stack
+uint16_t stack_pop(Stack *s)
+{	uint16_t res;
 	if(s->size!=0)	//you can only pop as long as the size is not 0
 	{
 		(res) = *(s->arr+s->size-1);
