@@ -20,8 +20,8 @@ typedef struct vec2_struct {
 	int32_t y;
 } vec2;
 
-vec2 calc_grav_raw(int32_t, int32_t, int32_t, int32_t);
-vec2 calc_grav(Entity *, Entity *);
+void calc_grav_raw(int32_t, int32_t, int32_t, int32_t, int32_t *, int32_t *);
+void calc_grav(Entity *, Entity *, int32_t *, int32_t *);
 void update_position(Entity *, int32_t);
-void update_velocity(Entity *, vec2, int32_t);
-vec2 calc_net_grav(Entity *, Entity *, uint32_t);
+void update_velocity(Entity *, int32_t, int32_t, int32_t);
+void calc_net_grav(Entity *, Entity *, uint32_t, int32_t *, int32_t *);

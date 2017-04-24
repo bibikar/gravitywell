@@ -771,6 +771,12 @@ void static setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
   writecommand(ST7735_RAMWR); // write to RAM
 }
 
+// Set the address window.
+// Publicly available so we can write the buffer in
+// the other file.
+void ST7735_SetWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
+	setAddrWindow(x0, y0, x1, y1);
+}
 
 // Send two bytes of data, most significant byte first
 // Requires 2 bytes of transmission
@@ -779,6 +785,11 @@ void static pushColor(uint16_t color) {
   writedata((uint8_t)color);
 }
 
+// Push a color to the display.
+// Publicly available so we can write the buffer efficiently.
+void ST7735_PushColor(uint16_t color) {
+	pushColor(color);
+}
 
 //------------ST7735_DrawPixel------------
 // Color the pixel at the given coordinates with the given color.

@@ -9,6 +9,10 @@ void systick_init(uint32_t reload, uint8_t enable_interrupts);
 
 // Stop systick.
 void systick_stop(void);
+	
+void systick_suspend(void);
+
+void systick_resume(void);
 
 // SysTick ISR
 void SysTick_Handler(void);
