@@ -6,7 +6,7 @@
 #include "../tm4c123gh6pm.h"
 #include "../game/queue.h"
 #include "../game/game.h"
-#include ";./timer/systick.h"
+#include "../timer/systick.h"
 
 // The switch on the left side of the board (if looking at the side with buttons)
 // is SW1 (which is PF4)
@@ -68,11 +68,12 @@ void portf_disable_interrupts() {
 
 void gpio_portf_handler() {
 	if (systick_getms() - ms < 10) {
+		portf_toggle(3);
 		GPIO_PORTF_ICR_R = 0x11;
-		ms = systick_getms();
 		return;
 		// If the button was pushed twice in 10 ms we can just ignore it.
 	}
+	portf_toggle(2);
 	Queue *event_queue = get_event_queue();
 	if (GPIO_PORTF_RIS_R & 0x01) {
 		queue_offer(event_queue, 0);

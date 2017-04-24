@@ -29,10 +29,10 @@ uint8_t buffer_test() {
 uint8_t game_test()
 {	
 	queue_init(&event_queue, event_arr, EVENT_QUEUE_SIZE);
+	systick_init(80000, 1);
 	portf_enable_interrupts();
 	uint32_t time, dt;
 	
-	systick_init(80000, 1);
 	
 	Entity e1, e2;
 	//e = {1000, 0, -100, 64, 160};
@@ -53,8 +53,20 @@ uint8_t game_test()
 	buffer_circle(e2.posX/1000,e2.posY/1000, 20, buffer_color(255,0,0));	
 	time = systick_getms();
 	portf_toggle(2);
-	while(portf_get(0)==0) { //as long as PF0 is not pressed		
+	while(1) { //as long as PF0 is not pressed		
 		portf_toggle(1);
+		while (!queue_empty(&event_queue)) {
+			portf_toggle(3);
+			uint32_t event = queue_poll(&event_queue);
+			if (event == 0) {
+				ST7735_FillScreen(ST7735_Color565(0, 0, 255));
+				while (queue_empty(&event_queue)) {}
+				uint32_t event2 = queue_poll(&event_queue);
+				if (event == 4) {
+					// quit game
+				}
+			}
+		}
 		// Calculate the force:
 		//int32_t forceX, forceY;
 		//calc_grav(&e1, &e2, &forceX, &forceY);

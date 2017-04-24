@@ -1,4 +1,5 @@
 #include<stdint.h>
+#include "queue.h"
 
 // The game itself
 uint8_t game_test();

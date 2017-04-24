@@ -54,7 +54,7 @@ void queue_put(Queue *q, uint32_t data) {
 // Input: Pointer to a character that will get the character read from the buffer
 // Output: 1 for success and 0 for failure
 //         failure is when the buffer is empty
-int32_t queue_poll(Queue *q)
+uint32_t queue_poll(Queue *q)
 {
 	// If the queue is empty, return failure
 	if (q->fr == q->capacity) return -1;
@@ -86,5 +86,9 @@ int queue_capacity(Queue *q) {
 
 int queue_size(Queue *q) {
 	return q->capacity - q->fr;
+}
+
+int queue_empty(Queue *q) {
+	return q->fr == q->capacity;
 }
 
