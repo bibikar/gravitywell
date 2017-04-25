@@ -87,8 +87,10 @@ uint8_t game_test()
 			uint32_t event = queue_poll(&event_queue);
 			if (event == 0) {
 				DisableInterrupts();
+				buffer_rect(PAUSE_MESSAGE_X - 4, PAUSE_MESSAGE_Y - 4, 72, 14, 0);
 				buffer_string(PAUSE_MESSAGE_X,PAUSE_MESSAGE_Y,"GAME PAUSED",buffer_color(0,0,255));
 				buffer_rect_outline(PAUSE_MESSAGE_X - 4, PAUSE_MESSAGE_Y - 4, 72, 14, buffer_color(0,0,255));
+				buffer_rect(72, 147, 50, 13, 0);
 				buffer_string(75, 150, "Continue", buffer_color(0, 0, 255));
 				buffer_write();
 				while(portf_get(0)){};
