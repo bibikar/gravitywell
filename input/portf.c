@@ -14,7 +14,7 @@
 // Thus, since we are using the board on the other side, the button 
 // on the right is PF4, and the button on the left is PF0.
 //
-uint32_t ms;
+uint32_t ms1;
 
 // Initialize port F.
 // Also unlocks PF0.
@@ -52,7 +52,7 @@ void portf_toggle(uint8_t pin) {
 }
 
 void portf_enable_interrupts() {
-	ms = systick_getms();
+	ms1 = systick_getms();
 	GPIO_PORTF_IS_R &= ~0x11; // PF0 and PF4 is edge-sensitive
 	GPIO_PORTF_IBE_R &= ~0x11; // PF0 and PF4 are not triggered by both edges
 	GPIO_PORTF_IEV_R &= ~0x11; // PF0, PF4 falling edge event
@@ -66,8 +66,8 @@ void portf_disable_interrupts() {
 	NVIC_EN0_R &= ~0x40000000; // disable interrupt 30 in NVIC
 }
 
-void gpio_portf_handler() {
-	if (systick_getms() - ms < 10) {
+void GPIOPortF_Handler() {
+	if (systick_getms() - ms1 < 10) {
 		portf_toggle(3);
 		GPIO_PORTF_ICR_R = 0x11;
 		return;
@@ -85,5 +85,5 @@ void gpio_portf_handler() {
 		// acknowledge flag on PF4:
 		GPIO_PORTF_ICR_R = 0x10;
 	}
-	ms = systick_getms();
+	ms1 = systick_getms();
 }

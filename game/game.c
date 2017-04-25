@@ -9,14 +9,25 @@
 #include "../timer/systick.h"
 
 #define EVENT_QUEUE_SIZE 8
+#define STAR_STACK_SIZE 128
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);
 void StartCritical(void);
 void EndCritical(void);
 
+typedef struct star_struct {
+	int16_t posX;
+	int16_t posY;
+	uint8_t vel;
+} Star;
+
 static uint32_t event_arr[EVENT_QUEUE_SIZE];
 Queue event_queue;
+static uint16_t star_stack_arr[STAR_STACK_SIZE];
+Stack star_stack;
+static Star[STAR_STACK_SIZE];
+
 
 uint8_t buffer_test() {
 	uint8_t color = 0;
@@ -28,7 +39,12 @@ uint8_t buffer_test() {
 }
 uint8_t game_test()
 {	
+	// Initialize the event queue.
 	queue_init(&event_queue, event_arr, EVENT_QUEUE_SIZE);
+	
+	// Initialize the shooting star stack and entities.
+	stack_init(&star_stack, star_stack_arr, STAR_STACK_SIZE);
+
 	systick_init(80000, 1);
 	portf_enable_interrupts();
 	uint32_t time, dt;
@@ -50,17 +66,17 @@ uint8_t game_test()
 
 	buffer_clear();
 	buffer_write();
-	buffer_circle(e2.posX/1000,e2.posY/1000, 20, buffer_color(255,0,0));	
 	time = systick_getms();
 	portf_toggle(2);
-	while(1) { //as long as PF0 is not pressed		
+	while(1) {
 		portf_toggle(1);
 		while (!queue_empty(&event_queue)) {
 			portf_toggle(3);
 			uint32_t event = queue_poll(&event_queue);
 			if (event == 0) {
 				DisableInterrupts();
-				ST7735_FillScreen(ST7735_Color565(0, 0, 255));
+				buffer_string(0,80,"GAME PAUSED",buffer_color(0,0,255));
+				buffer_write();
 				while(portf_get(0)){};
 				while(!queue_empty(&event_queue))
 					queue_poll(&event_queue);
@@ -70,9 +86,7 @@ uint8_t game_test()
 				{ while (queue_empty(&event_queue)) {}
 					event = queue_poll(&event_queue);
 				}while(event==0);
-				if (event == 4) {
-					// quit game
-				}
+				time = systick_getms();
 			}
 		}
 		// Calculate the force:
@@ -87,9 +101,25 @@ uint8_t game_test()
 		buffer_circle(e1.posX/1000,e1.posY/1000, 5, 0);	//erase the previous circle
 		//update the position
 		update_position(&e1, dt);
+
+		// Remove old objects:
+		for (int i = 0; i < STAR_STACK_SIZE; i++) {
+			if (star_arr[star_index].posY > 160) {
+				stack_push(&star_stack, i);
+				star_arr[star_index].vel = 0;
+			}
+		}
+
 		// Draw new objects:
+		buffer_circle(e2.posX/1000,e2.posY/1000, 20, buffer_color(255,0,0));	
 		buffer_circle(e1.posX/1000,e1.posY/1000, 5, buffer_color(255,0,0));		
 		buffer_write();
+
+		// Generate new asteroids and shooting stars:
+		if (!stack_empty(&star_stack)) {
+			uint16_t star_index = stack_pop(&star_stack);
+			star_arr[star_index] = {20,-10,20}; // this needs to be random
+		}
 	}
 	portf_disable_interrupts();
 	return 0;	

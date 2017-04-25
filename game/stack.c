@@ -15,6 +15,9 @@ void stack_init(Stack *s, uint16_t *arr, int capacity)
 	s->arr = arr;
 	s->size=0;
 	s->capacity=capacity;
+	for (int i = 0; i < capacity; i++) {
+		stack_push(s, i);
+	}
 }
 
 // Push the data onto the stack

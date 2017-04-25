@@ -13,4 +13,6 @@ void buffer_circle(int16_t, int16_t, int16_t, uint8_t);
 void buffer_rect(int16_t, int16_t, int16_t, int16_t, uint8_t);
 void buffer_rect_outline(int16_t, int16_t, int16_t, int16_t, uint8_t);
 void buffer_star(int16_t, int16_t);
+void buffer_char(int16_t, int16_t, char, uint8_t);
+void buffer_string(int16_t, int16_t, char*, uint8_t);
 void buffer_write();

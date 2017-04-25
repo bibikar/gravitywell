@@ -22,4 +22,4 @@ void portf_enable_interrupts(void);
 void portf_disable_interrupts(void);
 
 // Port F GPIO interrupt handler
-void gpio_portf_handler(void);
+void GPIOPortF_Handler(void);
