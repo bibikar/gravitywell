@@ -59,9 +59,17 @@ uint8_t game_test()
 			portf_toggle(3);
 			uint32_t event = queue_poll(&event_queue);
 			if (event == 0) {
+				DisableInterrupts();
 				ST7735_FillScreen(ST7735_Color565(0, 0, 255));
-				while (queue_empty(&event_queue)) {}
-				uint32_t event2 = queue_poll(&event_queue);
+				while(portf_get(0)){};
+				while(!queue_empty(&event_queue))
+					queue_poll(&event_queue);
+				EnableInterrupts();
+				
+				do
+				{ while (queue_empty(&event_queue)) {}
+					event = queue_poll(&event_queue);
+				}while(event==0);
 				if (event == 4) {
 					// quit game
 				}

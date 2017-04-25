@@ -5,8 +5,12 @@
 // Jonathan Valvano
 // November 17, 2014
 #include <stdint.h>
-#include "sound.h"
+#include "../sound/sound.h"
 #include "dac.h"
+#include "../timer/Timer1.h"
+#include "../tm4c123gh6pm.h"
+#include "../timer/Timer0.h"
+#include "../sound/sound_lookup.h"
 
 const uint8_t shoot[4080] = {
   129, 99, 103, 164, 214, 129, 31, 105, 204, 118, 55, 92, 140, 225, 152, 61, 84, 154, 184, 101, 
@@ -1137,12 +1141,114 @@ const uint8_t highpitch[1802] = {
   67, 119, 148, 166, 164, 238, 223, 202, 174, 112, 96, 78, 0, 34, 54, 99, 143, 160, 166, 183, 
   250, 207};
 
+
+
+//note_lookup has the systick reload values
+	
+//sine_lookup is the lookup table for the values of the sine wave
+
+uint32_t song_timer_delay = 10000000;
+uint8_t Index;
+//Index is for the sine_lookup - to find the values for the sine wave
+uint8_t get_index(void){
+	return Index;
+}
+
+void set_index(uint8_t data)
+{
+	Index = data;
+}
+	
 void Sound_Init(void){
-// write this
+// this will initialize the timer
+	DAC_Init();
+	Index = 0;
+	Timer0_Init(song_timer_delay);
+	Timer1_Init(10000);
 }
-void Sound_Play(const uint8_t *pt, uint32_t count){
-// write this
+
+void Sound_Play(uint32_t period){
+	TIMER1_TAILR_R = period-1;		//time0A calls Sound_Play with the reload value for Timer1A according to the note to be played
+} 
+
+int32_t current_note_index=0;
+int32_t current_note_duration_left=0;
+uint32_t song_length=32;
+
+struct note {
+	uint8_t pitch;
+	uint8_t amplitude;
+	uint8_t duration;
+};
+struct note song_notes[32] = {
+	{60, 8, 1},
+	{0, 0, 1},
+	{60, 8, 2},
+	{62, 8, 2},
+	{64, 8, 2},
+	{60, 8, 2},
+	{64, 8, 2},
+	{62, 8, 2},
+	{55, 8, 2},
+	{60, 8, 1},
+	{0, 0, 1},
+	{60, 8, 2},
+	{62, 8, 2},
+	{64, 8, 2},
+	{60, 8, 4},
+	{59, 8, 4},
+	{60, 8, 1},
+	{0, 0, 1},
+	{60, 8, 2},
+	{62, 8, 2},
+	{64, 8, 2},
+	{65, 8, 2},
+	{64, 8, 2},
+	{62, 8, 2},
+	{60, 8, 2},
+	{59, 8, 2},
+	{55, 8, 2},
+	{57, 8, 2},
+	{59, 8, 2},
+	{60, 8, 3},
+	{0, 0, 1},
+	{60, 8, 3}
+};
+
+
+
+void timer0A_song(void){
+	//do song related stuff
+	if (--current_note_duration_left <= 0) {
+	  // Decrement this and check if the note is over already.
+	  // If so, we need to get the next note.
+		if(current_note_index==song_length)
+			current_note_index=0;
+		else
+			current_note_index++;
+	 }
+  
+  // Get the note to be played
+  struct note current_note = song_notes[current_note_index];
+  if (current_note_duration_left <= 0){
+	  // If this is true, we just got a new note.
+		current_note_duration_left = current_note.duration;
+		// get the new duration to last the note for
+		Sound_Play(current_note.pitch);
+		// since we have a new note, get Sound.c to play it
+  }
+	
 }
+
+void timer1_play(){
+	//this is similar to the systick handler from lab6, this will call DAC_Out
+	uint8_t index;
+	index = get_index();
+	index = (index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
+	set_index(index);
+	DAC_Out(sine_lookup4[index]);
+}
+
 void Sound_Shoot(void){
 // write this
 }
