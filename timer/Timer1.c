@@ -25,7 +25,7 @@
 
 #include "../tm4c123gh6pm.h"
 #include "../sound/sound.h"
-#include "../sound/DAC.h"
+#include "../sound/dac.h"
 #include "../sound/sound_lookup.h"
 void timer1_play(void);
 void (*PeriodicTask1)(void);  // user function
