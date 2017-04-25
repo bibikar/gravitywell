@@ -4,7 +4,6 @@
 // The stack is basically a array of "pointers to void"
 // i.e. "pointers to anything"
 #include<stdint.h>
-#include<stdlib.h>
 
 
 struct stack_struct

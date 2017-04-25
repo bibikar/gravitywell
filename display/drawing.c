@@ -2,7 +2,6 @@
 // Draw primitives by directly referencing the ST7735 driver
 // Author: Sameer Bibikar
 
-#include <stdlib.h>
 #include <stdint.h>
 #include "ST7735.h"
 
