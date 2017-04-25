@@ -1570,3 +1570,7 @@ void Output_On(void){ // Turns on the display
 void Output_Color(uint32_t newColor){ // Set color of future output 
   ST7735_SetTextColor(newColor);
 }
+
+uint8_t ST7735_GetFont(int i) {
+	return Font[i];
+}

@@ -430,4 +430,6 @@ void Output_Color(uint32_t newColor);
 
 void LCD_OutDec(uint32_t data);  // output to LCD
 
+uint8_t ST7735_GetFont(int i);
+
 #endif
