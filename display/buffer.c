@@ -112,7 +112,7 @@ void buffer_rect_outline(int16_t x, int16_t y, int16_t w, int16_t h, uint8_t col
 	uint8_t xEnd = drawing_min(x+w, DISPLAY_WIDTH);
 	uint8_t yStart = drawing_max(y, 0);
 	uint8_t yEnd = drawing_min(y+h, DISPLAY_HEIGHT);
-	for (uint8_t i = xStart; i < xEnd; i++) {
+	for (uint8_t i = xStart; i <= xEnd; i++) {
 		buffer[i][yStart] = color;
 		buffer[i][yEnd] = color;
 	}

@@ -26,7 +26,7 @@ void stack_push(Stack *s, uint16_t data)
 	//*data is the data to be pushed onto the stack
 	if(s->size<s->capacity)	//you can only push if the size is less than the capacity
 	{
-		*(s->arr+s->size-1) = data;
+		*(s->arr+s->size) = data;
 		++s->size;	
 	}	
 }
@@ -37,6 +37,7 @@ uint16_t stack_pop(Stack *s)
 	if(s->size!=0)	//you can only pop as long as the size is not 0
 	{
 		(res) = *(s->arr+s->size-1);
+		s->size--;
 	}
 	return res;	
 }
