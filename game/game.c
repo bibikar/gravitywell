@@ -151,6 +151,7 @@ uint8_t game_test()
 		for (int i = 0; i < STAR_STACK_SIZE; i++) {
 			if (star_arr[i].posY > 160) {
 				stack_push(&star_stack, i);
+				// If vel ==0 skip draw
 				star_arr[i].vel = 0;
 			}
 		}
@@ -160,7 +161,8 @@ uint8_t game_test()
 			// of absolutely.
 			if (asteroid_arr[i].posY > 160) {
 				stack_push(&asteroid_stack, i);
-				asteroid_arr[i].vel = 0;
+				// If the mass is zero, then we'll skip drawing.
+				asteroid_arr[i].mass = 0;
 			}
 		}
 
@@ -189,6 +191,7 @@ uint8_t game_test()
 		}
 	}
 	portf_disable_interrupts();
+	// TODO Return what happened, instead of just 0 = main menu
 	return 0;	
 }
 
