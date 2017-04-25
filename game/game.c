@@ -9,9 +9,11 @@
 #include "../math/physics.h"
 #include "../timer/systick.h"
 #include "../math/random.h"
+#include "../math/random_squares.h"
 
 #define EVENT_QUEUE_SIZE 8
 #define STAR_STACK_SIZE 128
+#define STARS_PER_FRAME 3
 
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
@@ -33,7 +35,6 @@ static uint16_t star_stack_arr[STAR_STACK_SIZE];
 Stack star_stack;
 static Star star_arr[STAR_STACK_SIZE];
 
-static uint8_t temp_i = 0;
 
 
 uint8_t buffer_test() {
@@ -120,7 +121,7 @@ uint8_t game_test()
 		update_position(&e1, dt);
 		for (int i = 0; i < STAR_STACK_SIZE; i++) {
 			if (star_arr[i].vel == 0) continue;
-			star_arr[i].posY += star_arr[i].vel * dt / 40;
+			star_arr[i].posY += star_arr[i].vel * dt / 400;
 		}
 
 		// Remove old objects:
@@ -144,9 +145,10 @@ uint8_t game_test()
 
 		// Generate new asteroids and shooting stars:
 		if (!stack_empty(&star_stack)) {
-			uint16_t star_index = stack_pop(&star_stack);
-			star_arr[star_index] = (Star){Random()%128,-10,Random()%5+1};
-			temp_i+=2;
+			for (int i = 0; i < STARS_PER_FRAME; i++) {
+				uint16_t star_index = stack_pop(&star_stack);
+				star_arr[star_index] = (Star){srandom()%128,-10,srandom()%32+30};
+			}
 		}
 	}
 	portf_disable_interrupts();
