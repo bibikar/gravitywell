@@ -1143,6 +1143,7 @@ const uint8_t highpitch[1802] = {
 
 
 
+
 //note_lookup has the systick reload values
 	
 //sine_lookup is the lookup table for the values of the sine wave
@@ -1246,7 +1247,7 @@ void timer1_play(){
 	index = get_index();
 	index = (index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
 	set_index(index);
-	DAC_Out(sine_lookup4[index]);
+	DAC_Out(sine_lookup6[index]);
 }
 
 void Sound_Shoot(void){
