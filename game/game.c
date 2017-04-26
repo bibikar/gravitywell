@@ -64,7 +64,11 @@ uint8_t game_test()
 	// Remember we are using "millipixels" as the unit
 	stack_init(&asteroid_stack, asteroid_stack_arr, ASTEROID_STACK_SIZE);
 	for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
-		asteroid_arr[i] = (Entity) {0,0,0,0,0};
+		asteroid_arr[i].posX = 0;
+		asteroid_arr[i].posY = 0;
+		asteroid_arr[i].velX = 0;
+		asteroid_arr[i].velX = 0;
+		asteroid_arr[i].mass = 0;
 	}
 
 	// Initialize the player's ship
@@ -186,7 +190,11 @@ uint8_t game_test()
 		if (!stack_empty(&asteroid_stack)) {
 			// TODO add a condition here: only spawn new asteroids when we want to
 			uint16_t asteroid_index = stack_pop(&asteroid_stack);
-			asteroid_arr[asteroid_index] = (Entity){0, 0, 0, 0, 0}; 
+			asteroid_arr[asteroid_index].posX = 0;
+			asteroid_arr[asteroid_index].posY = 0;
+			asteroid_arr[asteroid_index].velX = 0;
+			asteroid_arr[asteroid_index].velX = 0;
+			asteroid_arr[asteroid_index].mass = 0;
 			// TODO fill these with random values which make sense
 		}
 	}

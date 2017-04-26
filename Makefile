@@ -30,7 +30,6 @@ CFLAGS = -g -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 CFLAGS +=-Os -ffunction-sections -fdata-sections -MD -std=c99 -Wall
 CFLAGS += -pedantic -DPART_$(MCU) -c -I$(TIVAWARE_PATH)
 CFLAGS += -DTARGET_IS_BLIZZARD_RA1
-CFLAGS += -ftree-loop-distribute-patterns -O2
 LDFLAGS = -T $(LD_SCRIPT) --entry ResetISR --gc-sections
 
 #######################################
