@@ -15,6 +15,7 @@
 #define STAR_STACK_SIZE 128
 #define ASTEROID_STACK_SIZE 64
 #define STARS_PER_FRAME 3
+#define ASTEROID_SPAWN_FRAMES 10
 
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
@@ -40,6 +41,7 @@ static Star star_arr[STAR_STACK_SIZE];
 static uint16_t asteroid_stack_arr[ASTEROID_STACK_SIZE];
 Stack asteroid_stack;
 static Entity asteroid_arr[ASTEROID_STACK_SIZE];
+static uint32_t asteroid_spawn_index = 0;
 
 uint8_t buffer_test() {
 	uint8_t color = 0;
@@ -163,7 +165,7 @@ uint8_t game_test()
 			// TODO account for the ship's position and the fact that
 			// the asteroids are being rendered relative to the ship instead 
 			// of absolutely.
-			if (asteroid_arr[i].posY > 160) {
+			if (asteroid_arr[i].posY > 160*1000) {
 				stack_push(&asteroid_stack, i);
 				// If the mass is zero, then we'll skip drawing.
 				asteroid_arr[i].mass = 0;
@@ -175,6 +177,10 @@ uint8_t game_test()
 		for (int i = 0; i < STAR_STACK_SIZE; i++) {
 			if (star_arr[i].vel == 0) continue;
 			buffer_star(star_arr[i].posX, star_arr[i].posY);
+		}
+		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
+			if (asteroid_arr[i].mass == 0) continue;
+			buffer_circle(asteroid_arr[i].posX/1000, asteroid_arr[i].posY/1000, asteroid_arr[i].mass / 1000, 255);
 		}
 		// The asteroids are in the foreground.
 		buffer_write();
@@ -189,12 +195,14 @@ uint8_t game_test()
 
 		if (!stack_empty(&asteroid_stack)) {
 			// TODO add a condition here: only spawn new asteroids when we want to
-			uint16_t asteroid_index = stack_pop(&asteroid_stack);
-			asteroid_arr[asteroid_index].posX = 0;
-			asteroid_arr[asteroid_index].posY = 0;
-			asteroid_arr[asteroid_index].velX = 0;
-			asteroid_arr[asteroid_index].velX = 0;
-			asteroid_arr[asteroid_index].mass = 0;
+			if (++asteroid_spawn_index % (srandom() % ASTEROID_SPAWN_FRAMES) == 0) {
+				uint16_t asteroid_index = stack_pop(&asteroid_stack);
+				asteroid_arr[asteroid_index].posX = srandom() % 128000;
+				asteroid_arr[asteroid_index].posY = -10;
+				asteroid_arr[asteroid_index].velX = 0;
+				asteroid_arr[asteroid_index].velY = 60;
+				asteroid_arr[asteroid_index].mass = 5000;
+			}
 			// TODO fill these with random values which make sense
 		}
 	}
