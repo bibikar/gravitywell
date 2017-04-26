@@ -120,6 +120,9 @@ uint8_t game_test()
 				time = systick_getms();
 			}
 		}
+
+		// TODO Poll the potentiometer(s)
+
 		// Calculate the force:
 		//int32_t forceX, forceY;
 		//calc_grav(&e1, &e2, &forceX, &forceY);
@@ -155,17 +158,17 @@ uint8_t game_test()
 
 		// Remove old objects:
 		for (int i = 0; i < STAR_STACK_SIZE; i++) {
-			if (star_arr[i].posY > 160) {
+			if (star_arr[i].vel != 0 && star_arr[i].posY > 160) {
 				stack_push(&star_stack, i);
 				// If vel ==0 skip draw
 				star_arr[i].vel = 0;
 			}
 		}
-		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
+		for (uint16_t i = 0; i < ASTEROID_STACK_SIZE; i++) {
 			// TODO account for the ship's position and the fact that
 			// the asteroids are being rendered relative to the ship instead 
 			// of absolutely.
-			if (asteroid_arr[i].posY > 160*1000) {
+			if (asteroid_arr[i].mass != 0 && asteroid_arr[i].posY > 160*1000) {
 				stack_push(&asteroid_stack, i);
 				// If the mass is zero, then we'll skip drawing.
 				asteroid_arr[i].mass = 0;
@@ -184,6 +187,10 @@ uint8_t game_test()
 		}
 		// The asteroids are in the foreground.
 		buffer_write();
+
+		// TODO Check if the level is over. If so, return!
+		// TODO Check collisions.
+		// TODO Check if the player is still alive.
 
 		// Generate new asteroids and shooting stars:
 		if (!stack_empty(&star_stack)) {
