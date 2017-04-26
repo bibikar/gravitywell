@@ -6,6 +6,7 @@
 
 // We have done some #defines in the menu.h file.
 #include "menu.h"
+#include "../game/game.h"
 
 #define LEFT_BUTTON 0x01
 #define RIGHT_BUTTON 0x02
@@ -64,9 +65,11 @@ uint8_t show_main_menu_selector(const uint8_t rows[], const uint8_t row_count) {
 // The data to pass is uneccessary except for the following cases:
 // MENU_GAME_OVER, MENU_YOU_WIN: the score to display
 // MENU_NEXT_LEVEL: the next level to go to
-uint8_t show_menu(uint8_t id, uint32_t data) {
-		uint8_t help_screen_index = 0;
-	  char *this_help = 0;
+uint8_t show_menu(GameStatus status) {
+	uint8_t id = status.status;
+	uint32_t data = status.data;
+	uint8_t help_screen_index = 0;
+	char *this_help = 0;
 	switch(id) {
 		case MENU_MAIN:
 			while (menu_get_button_status() != 0) {}
@@ -193,11 +196,5 @@ uint8_t show_menu(uint8_t id, uint32_t data) {
 			}
 			return MENU_MAIN; // let's try to get back to the main menu.
 	}
-}
-
-// Shows a menu which doesn't require any data parameter
-// Just abstracts out a call to show_menu anyway though
-uint8_t show_boring_menu(uint8_t id) {
-	return show_menu(id, 0);
 }
 

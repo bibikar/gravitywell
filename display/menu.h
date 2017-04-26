@@ -1,7 +1,8 @@
 // menu.h
 // All public functions for menu.c
 // Author = Sameer Bibikar, Sneha Pendharkar
-#include<stdint.h>
+#include <stdint.h>
+#include "../game/game.h"
 
 #define MENU_MAIN 0
 #define MENU_NEW_GAME 1
@@ -16,10 +17,4 @@
 
 // Show the menu whose ID is given by id.
 // Remember to give data if applicable.
-uint8_t show_menu(uint8_t id, uint32_t data);
-
-// Show the menu whose ID is given by id.
-// But since we're lazy don't put any data
-// (you could use show_menu with zero
-// and it would do the same thing)
-uint8_t show_boring_menu(uint8_t id);
+uint8_t show_menu(GameStatus status);

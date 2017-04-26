@@ -67,19 +67,21 @@ void Delay100ms(uint32_t count); // time delay in 0.1 seconds
 // *************************** Capture image dimensions out of BMP**********
 
 int main(void){
-  TExaS_Init();  // set system clock to 80 MHz
-  //Random_Init(1);
+	TExaS_Init();  // set system clock to 80 MHz
+	//Random_Init(1);
 
-  Output_Init();
-  ST7735_FillScreen(0x0000);            // set screen to black
-  portf_init();
-	uint8_t flag = MENU_MAIN;
-	while(1){
-		if(flag==1) {
-			flag = game_test();
+	Output_Init();
+	ST7735_FillScreen(0x0000);            // set screen to black
+	portf_init();
+
+	GameStatus status;
+	status.status = MENU_MAIN;
+	while (1) {
+		if (status.status == MENU_NEW_GAME) {
+			status = game_test(1);
 		}
-		flag = show_menu(flag,0);	//second number is the score		
-  }
+		status.status = show_menu(status);	//second number is the score		
+	}
 
 }
 
