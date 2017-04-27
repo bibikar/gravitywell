@@ -12,6 +12,7 @@
 #include "../tm4c123gh6pm.h"
 #include "../timer/Timer0.h"
 #include "../sound/sound_lookup.h"
+#include "../input/portf.h"
 
 typedef struct note {
 	uint8_t pitch;
@@ -23,7 +24,7 @@ typedef struct song {
 	uint32_t length;
 } Song;
 
-const Note const yankee[32] = {
+const Note yankee[32] = {
 	{60, 1},
 	{0, 1},
 	{60, 2},
@@ -34,7 +35,7 @@ const Note const yankee[32] = {
 	{62, 2},
 	{55, 2},
 	{60, 1},
-	{0, 1},
+	{62, 1},
 	{60, 2},
 	{62, 2},
 	{64, 2},
@@ -110,6 +111,7 @@ void Sound_Play(uint32_t period){
 
 void timer0A_song(void){
 	//do song related stuff
+	portf_toggle(2);
 	if (--current_note_duration_left <= 0) {
 	  // Decrement this and check if the note is over already.
 	  // If so, we need to get the next note.
@@ -125,18 +127,18 @@ void timer0A_song(void){
 	  // If this is true, we just got a new note.
 		current_note_duration_left = current_note.duration;
 		// get the new duration to last the note for
-		Sound_Play(current_note.pitch);
+		Sound_Play(note_lookup[current_note.pitch]);
 		// since we have a new note, get Sound.c to play it
   }
+	portf_toggle(2);
 	
 }
 
 void timer1_play(){
 	//this is similar to the systick handler from lab6, this will call DAC_Out
-	uint8_t index;
-	index = get_index();
-	index = (index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
-	set_index(index);
-	DAC_Out(sine_lookup6[index]);
+	portf_toggle(3);
+	Index = (Index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
+	DAC_Out(sine_lookup6[Index]);
+	portf_toggle(3);
 }
 
