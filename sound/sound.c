@@ -13,11 +13,17 @@
 #include "../timer/Timer0.h"
 #include "../sound/sound_lookup.h"
 
-struct note {
+typedef struct note {
 	uint8_t pitch;
 	uint8_t duration;
-};
-const struct note song_notes[32] = {
+} Note;
+
+typedef struct song {
+	const Note * const note_arr;
+	uint32_t length;
+} Song;
+
+const Note const yankee[32] = {
 	{60, 1},
 	{0, 1},
 	{60, 2},
@@ -52,12 +58,20 @@ const struct note song_notes[32] = {
 	{60, 3}
 };
 
+const Song songs[] = {
+	{yankee, 32}
+};
+
+Note *song_notes = (Note *)yankee;
+uint32_t song_length=32;
 
 
 //note_lookup has the systick reload values
 	
 //sine_lookup is the lookup table for the values of the sine wave
 
+int32_t current_note_index=0;
+int32_t current_note_duration_left=0;
 uint32_t song_timer_delay = 10000000;
 uint8_t Index;
 //Index is for the sine_lookup - to find the values for the sine wave
@@ -70,10 +84,23 @@ void set_index(uint8_t data)
 	Index = data;
 }
 	
-void Sound_Init(void){
+void Sound_Init(uint8_t song_index){
 // this will initialize the timer
+	// Update the song pointer and the length
+	Song *next_song = (Song *) &songs[song_index];
+	song_notes = (Note *) next_song->note_arr;
+	song_length = next_song->length;
+
 	DAC_Init();
+
+	// Reset the index of the sine lookup
 	Index = 0;
+
+	// Reset the index for which note to play
+	current_note_index = 0;
+	current_note_duration_left = 0;
+	
+	// Initialize the timers with appropriate delays
 	Timer0_Init(song_timer_delay);
 	Timer1_Init(10000);
 }
@@ -82,9 +109,6 @@ void Sound_Play(uint32_t period){
 	TIMER1_TAILR_R = period-1;		//time0A calls Sound_Play with the reload value for Timer1A according to the note to be played
 } 
 
-int32_t current_note_index=0;
-int32_t current_note_duration_left=0;
-uint32_t song_length=32;
 
 void timer0A_song(void){
 	//do song related stuff

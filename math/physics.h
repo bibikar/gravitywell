@@ -15,10 +15,14 @@ typedef struct entity_struct {
 
 #endif
 
+#ifndef VECTOR_DEFINED
+#define VECTOR_DEFINED
+
 typedef struct vec2_struct {
 	int32_t x;
 	int32_t y;
 } vec2;
+#endif
 
 void calc_grav_raw(int32_t, int32_t, int32_t, int32_t, int32_t *, int32_t *);
 void calc_grav(Entity *, Entity *, int32_t *, int32_t *);

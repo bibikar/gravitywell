@@ -39,10 +39,12 @@ typedef struct star_struct {
 } Star;
 
 // The possible types of bonuses that can appear
+// BONUS_UNUSED: notes that the bonus isn't on the screen and can't be collected
 // BONUS_HEALTH: repairs the player's ship immediately
 // BONUS_ATTACK: allows the player to fire a projectile which destroys asteroids
 // BONUS_SCORE: grants the player a score bonus
 typedef enum bonus_type {
+	BONUS_UNUSED,
 	BONUS_HEALTH,
 	BONUS_ATTACK,
 	BONUS_SCORE
@@ -80,7 +82,7 @@ static uint32_t asteroid_spawn_index = 0;
 
 static uint16_t bonus_stack_arr[BONUS_STACK_SIZE];
 Stack bonus_stack;
-static Entity bonus_arr[BONUS_STACK_SIZE];
+static Bonus bonus_arr[BONUS_STACK_SIZE];
 
 static Entity ship;
 static uint8_t ship_health;
@@ -114,6 +116,13 @@ GameStatus game_test(uint8_t level)
 		asteroid_arr[i].velX = 0;
 		asteroid_arr[i].velX = 0;
 		asteroid_arr[i].mass = 0;
+	}
+
+	// Initialize the Bonus stack and entities.
+	// Using millipixels as the unit
+	stack_init(&bonus_stack, bonus_stack_arr, BONUS_STACK_SIZE);
+	for (int i = 0; i < BONUS_STACK_SIZE; i++) {
+		bonus_arr[i].type = BONUS_UNUSED;
 	}
 
 	// Initialize the player's ship
@@ -246,6 +255,20 @@ GameStatus game_test(uint8_t level)
 
 		// TODO Check if the level is over. If so, return!
 		// TODO Check collisions.
+		
+		// Check if the player collided with asteroids:
+		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
+			if (asteroid_arr[i].mass == 0) continue;
+			// check the collision
+			// if collision is true, then decrement health
+		}
+
+		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
+			if (bonus_arr[i].type == BONUS_UNUSED) continue;
+			// check the collision
+			// if collision is true, do somethign
+			// depending on what type of bonus
+		}
 		// TODO Check if the player is still alive.
 		// If dead, return game over.
 
