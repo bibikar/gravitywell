@@ -55,7 +55,6 @@ uint32_t convert(uint32_t input){
 }
 
 uint32_t adc_poll(){
-	ADC_Init();
 	uint32_t data, result;
 	data = ADC_In();	//get 12 bit number - between 0 to 4096
 	result = convert(data);	//get the actual force

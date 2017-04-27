@@ -31,6 +31,9 @@ void (*PeriodicTask0)(void);
 //void (*PeriodicTask0)(void) = &timer0A_song;// user function
 long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
+void DisableInterrupts();
+void EnableInterrupts();
+
 
 
 // ***************** Timer0_Init ****************
@@ -39,10 +42,11 @@ void EndCritical(long sr);    // restore I bit to previous value
 //          period in units (1/clockfreq)
 // Outputs: none
 void Timer0_Init(uint32_t period){
-  long sr;
-	sr = StartCritical();
+  //long sr;
+	//sr = StartCritical();]
+	DisableInterrupts();
 	SYSCTL_RCGCTIMER_R |= 0x01;   // 0) activate TIMER0
-  PeriodicTask0 = timer0A_song;          // user function
+  //PeriodicTask0 = timer0A_song;          // user function
   TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A during setup
   TIMER0_CFG_R = 0x00000000;    // 2) configure for 32-bit mode
   TIMER0_TAMR_R = 0x00000002;   // 3) configure for periodic mode, default down-count settings
@@ -55,7 +59,8 @@ void Timer0_Init(uint32_t period){
 // vector number 35, interrupt number 19
   NVIC_EN0_R = 1<<19;           // 9) enable IRQ 19 in NVIC
   TIMER0_CTL_R = 0x00000001;    // 10) enable TIMER0A
-	EndCritical(sr);
+	//EndCritical(sr);
+	EnableInterrupts();
 }
 
 
@@ -64,8 +69,9 @@ void Timer0_Init(uint32_t period){
 
 void Timer0A_Handler(void){
   TIMER0_ICR_R = TIMER_ICR_TATOCINT; // acknowledge TIMER0A timeout
-	(*PeriodicTask0)();                // execute user task, this is a function pointer
+	//*PeriodicTask0)();                // execute user task, this is a function pointer
 	//PeriodicTask0 is a pointer to a function that has no argument and returns nothing
+	timer0A_song();
 }
 
 

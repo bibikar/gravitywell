@@ -58,6 +58,8 @@
 #include "display/menu.h"
 #include "input/portf.h"
 #include "game/game.h"
+#include "sound/dac.h"
+#include "sound/sound.h"
 
 
 void DisableInterrupts(void); // Disable interrupts
@@ -73,7 +75,8 @@ int main(void){
 	Output_Init();
 	ST7735_FillScreen(0x0000);            // set screen to black
 	portf_init();
-
+	DAC_Init();
+	Sound_Init(0);
 	GameStatus status;
 	status.status = MENU_MAIN;
 	while (1) {

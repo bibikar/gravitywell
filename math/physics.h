@@ -5,6 +5,7 @@
 #ifndef ENTITY_DEFINED
 #define ENTITY_DEFINED
 
+
 typedef struct entity_struct {
 	int32_t mass;
 	int32_t velX;

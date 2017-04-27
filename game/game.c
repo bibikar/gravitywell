@@ -98,6 +98,7 @@ uint8_t buffer_test() {
 }
 GameStatus game_test(uint8_t level)
 {	
+	ADC_Init();
 	// Initialize the event queue.
 	queue_init(&event_queue, event_arr, EVENT_QUEUE_SIZE);
 	

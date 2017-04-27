@@ -500,6 +500,16 @@
               <FileType>1</FileType>
               <FilePath>.\linkedlist.c</FilePath>
             </File>
+            <File>
+              <FileName>buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\display\buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>game.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\game\game.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

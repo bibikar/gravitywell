@@ -91,8 +91,6 @@ void Sound_Init(uint8_t song_index){
 	song_notes = (Note *) next_song->note_arr;
 	song_length = next_song->length;
 
-	DAC_Init();
-
 	// Reset the index of the sine lookup
 	Index = 0;
 
