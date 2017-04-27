@@ -26,6 +26,8 @@
 #include "inc/hw_nvic.h"
 #include "inc/hw_types.h"
 #include "timer/systick.h"
+#include "timer/Timer0.h"
+#include "timer/Timer1.h"
 #include "input/portf.h"
 
 //*****************************************************************************
@@ -97,9 +99,9 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // ADC Sequence 2
     IntDefaultHandler,                      // ADC Sequence 3
     IntDefaultHandler,                      // Watchdog timer
-    IntDefaultHandler,                      // Timer 0 subtimer A
+    Timer0A_Handler,                      // Timer 0 subtimer A
     IntDefaultHandler,                      // Timer 0 subtimer B
-    IntDefaultHandler,                      // Timer 1 subtimer A
+    Timer1A_Handler,                      // Timer 1 subtimer A
     IntDefaultHandler,                      // Timer 1 subtimer B
     IntDefaultHandler,                      // Timer 2 subtimer A
     IntDefaultHandler,                      // Timer 2 subtimer B

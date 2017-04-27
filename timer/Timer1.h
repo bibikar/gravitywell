@@ -34,3 +34,5 @@
 void Timer1_Init(uint32_t period);
 
 #endif // __TIMER2INTS_H__
+
+void Timer1A_Handler(void);

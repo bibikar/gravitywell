@@ -23,6 +23,7 @@ void ADC_Init(void){
   GPIO_PORTE_DEN_R &= ~0x10;   
   GPIO_PORTE_AMSEL_R |= 0x10;   
   SYSCTL_RCGCADC_R |= 0x01;      
+  portf_toggle(1);
   delay = 42;
   delay = 43;
   delay = 44;
