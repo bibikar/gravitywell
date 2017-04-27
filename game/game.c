@@ -10,7 +10,7 @@
 #include "../timer/systick.h"
 #include "../math/random.h"
 #include "../math/random_squares.h"
-
+#include "../input/adc.h"
 #define EVENT_QUEUE_SIZE 8
 #define STAR_STACK_SIZE 128
 #define ASTEROID_STACK_SIZE 64
@@ -181,7 +181,8 @@ GameStatus game_test(uint8_t level)
 		}
 
 		// TODO Poll the potentiometer(s)
-		int32_t thruster_force = 0; // TODO get this from potentiometer
+		int32_t thruster_force = adc_poll(); // TODO get this from potentiometer
+
 
 		// Calculate the force:
 		//int32_t forceX, forceY;
