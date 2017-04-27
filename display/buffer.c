@@ -207,11 +207,15 @@ void buffer_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const unsigned sh
 	//x and y are the top left coordinates
 	//w and h are the width and height of the buffer
 	uint32_t i,j,size, count=0;
-	for(i=x;i<=(x+w);++i)
+	uint8_t xStart = drawing_max(x, 0);
+	uint8_t xEnd = drawing_min(x+w, DISPLAY_WIDTH);
+	uint8_t yStart = drawing_max(y, 0);
+	uint8_t yEnd = drawing_min(y+h, DISPLAY_HEIGHT);
+	for(i=yStart;i<=yEnd;++i)
 	{
-		for(j=y;j<=(y+h);++y)
-		{
-			buffer[i][j] = s[count];
+		for(j=xStart;j<=xEnd;++j)
+		{	if(s[count]!=0)
+				buffer[j][i] = s[count];
 			++count;
 		}
 	}
