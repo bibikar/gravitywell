@@ -24,7 +24,7 @@ typedef struct song {
 	uint32_t length;
 } Song;
 
-const Note yankee[32] = {
+const Note const yankee[32] = {
 	{60, 1},
 	{0, 1},
 	{60, 2},
