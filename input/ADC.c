@@ -7,6 +7,9 @@
 
 #include <stdint.h>
 #include "../tm4c123gh6pm.h"
+#include "../display/ST7735.h"
+#include "../timer/systick.h"
+
 
 // ADC initialization function 
 // Input: none
@@ -46,5 +49,18 @@ uint32_t ADC_In(void){
   ADC0_ISC_R = 0x0008;             // 4) acknowledge completion
   return result;
 }
+
+uint32_t convert(uint32_t input){
+	return 42;	//replace with equation for calibration
+}
+
+uint32_t adc_poll(){
+	ADC_Init();
+	uint32_t data, result;
+	data = ADC_In();	//get 12 bit number - between 0 to 4096
+	result = convert(data);	//get the actual force
+	return result;	
+}
+
 
 
