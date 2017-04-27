@@ -20,7 +20,7 @@
 void DAC_Init(void){
 	// PB0-5 are outputs
 	volatile uint32_t delay;
-	SYSCTL_RCGC2_R |= 0x02;	//turn on clock for Port B
+	SYSCTL_RCGCGPIO_R |= 0x02;	//turn on clock for Port B
 	delay = 42;	//time to allow the clock to stabilise
 	GPIO_PORTB_AMSEL_R &= ~0x3F;	//turn off analog function
 	GPIO_PORTB_DIR_R |= 0x3F;

@@ -486,21 +486,6 @@
               <FilePath>.\input\portf.c</FilePath>
             </File>
             <File>
-              <FileName>stack.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\stack.c</FilePath>
-            </File>
-            <File>
-              <FileName>levelgen.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\levelgen.c</FilePath>
-            </File>
-            <File>
-              <FileName>linkedlist.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\linkedlist.c</FilePath>
-            </File>
-            <File>
               <FileName>buffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\display\buffer.c</FilePath>
@@ -509,6 +494,31 @@
               <FileName>game.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\game\game.c</FilePath>
+            </File>
+            <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\timer\systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\game\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>stack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\game\stack.c</FilePath>
+            </File>
+            <File>
+              <FileName>random_squares.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\math\random_squares.c</FilePath>
+            </File>
+            <File>
+              <FileName>sound_lookup.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\sound\sound_lookup.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -76,6 +76,7 @@ int main(void){
 	ST7735_FillScreen(0x0000);            // set screen to black
 	portf_init();
 	DAC_Init();
+	
 	Sound_Init(0);
 	GameStatus status;
 	status.status = MENU_MAIN;

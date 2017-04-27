@@ -58,7 +58,8 @@ void Timer1_Init(uint32_t period){
 }
 
 void Timer1A_Handler(void){
-  TIMER1_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER1A timeout
+  
   timer1_play();             // execute user task
+	TIMER1_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER1A timeout
 }
 
