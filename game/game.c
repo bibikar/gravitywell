@@ -10,7 +10,7 @@
 #include "../timer/systick.h"
 #include "../math/random.h"
 #include "../math/random_squares.h"
-#include "../input/adc.h"
+#include "../input/ADC.h"
 #define EVENT_QUEUE_SIZE 8
 #define STAR_STACK_SIZE 128
 #define ASTEROID_STACK_SIZE 64
