@@ -102,8 +102,8 @@ void update_position(Entity *e, int32_t dt) {
 // Inputs: Pointer to entity and time interval
 // Outputs nothing
 void update_velocity(Entity *e, int32_t forceX, int32_t forceY, int32_t dt) {
-	e->velX += forceX * dt / e->mass * GRAVITATIONAL_CONSTANT / GRAVITATIONAL_DIVISOR;
-	e->velY += forceY * dt / e->mass * GRAVITATIONAL_CONSTANT / GRAVITATIONAL_DIVISOR;
+	e->velX += forceX * dt / e->mass;
+	e->velY += forceY * dt / e->mass;
 }
 
 // calc_net_grav(e, others, entity_count)

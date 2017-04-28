@@ -227,6 +227,9 @@ GameStatus game_test(uint8_t level)
 			update_position(&asteroid_arr[i], dt);
 		}
 
+		// Update the ship position
+		update_position(&ship, dt);
+
 		// Remove old objects:
 		for (int i = 0; i < STAR_STACK_SIZE; i++) {
 			if (star_arr[i].vel != 0 && star_arr[i].posY > 160) {
@@ -271,6 +274,12 @@ GameStatus game_test(uint8_t level)
 		// The asteroids are in the foreground.
 		//
 		// TODO draw the ship here
+		Point ship_pt = get_display_coordinates(&ship);
+		buffer_circle(ship_pt.x, ship_pt.y, 10, buffer_color(255, 0, 0));
+
+		// TODO Show how much health is left in the ship:
+		// For this, we can print the heart characters in red, top left corner.
+
 		// Write the buffer to the display.
 		buffer_write();
 
