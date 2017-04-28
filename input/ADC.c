@@ -51,11 +51,14 @@ uint32_t ADC_In(void){
   return result;
 }
 
-uint32_t convert(uint32_t input){
-	return 42;	//replace with equation for calibration
+int32_t convert(uint32_t input){
+	return 2048 - input;	//replace with equation for calibration
+	// Input can be from 0 - 4095, so we want to get the most
+	// granularity out of the input as we possibly can. All the
+	// "conversion" can be done elsewhere.
 }
 
-uint32_t adc_poll(){
+int32_t adc_poll(){
 	uint32_t data, result;
 	data = ADC_In();	//get 12 bit number - between 0 to 4096
 	result = convert(data);	//get the actual force

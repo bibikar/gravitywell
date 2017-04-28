@@ -17,6 +17,6 @@ void ADC_Init(void);
 // Output: 12-bit result of ADC conversion
 uint32_t ADC_In(void);
 
-uint32_t adc_poll();
+int32_t adc_poll();
 
-uint32_t convert(uint32_t);
+int32_t convert(uint32_t);
