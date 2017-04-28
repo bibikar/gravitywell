@@ -20,6 +20,8 @@
 #define ASTEROID_SPAWN_FRAMES 10
 #define BONUS_PER_LEVEL 3
 
+#define SHIP_DISPLAY_X 60
+#define SHIP_DISPLAY_Y 40
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
 
@@ -88,14 +90,16 @@ static Entity ship;
 static uint8_t ship_health;
 static uint32_t score;
 
-uint8_t buffer_test() {
-	uint8_t color = 0;
-	while(portf_get(0) == 0) {
-	buffer_fill(color++);
-	buffer_write();
-	}
-	return 0;	
+typedef struct point_struct {
+	int32_t x;
+	int32_t y;
+} Point;
+
+Point get_display_coordinates(Entity *e) {
+	return (Point) {(e->posX - ship.posX)/1000 + SHIP_DISPLAY_X, 
+		(e->posY - ship.posY)/1000 + SHIP_DISPLAY_Y};
 }
+
 GameStatus game_test(uint8_t level)
 {	
 	ADC_Init();
@@ -232,11 +236,11 @@ GameStatus game_test(uint8_t level)
 			}
 		}
 		for (uint16_t i = 0; i < ASTEROID_STACK_SIZE; i++) {
-			// TODO account for the ship's position and the fact that
-			// the asteroids are being rendered relative to the ship instead 
-			// of absolutely.
-			if (asteroid_arr[i].mass != 0 && asteroid_arr[i].posY > 160*1000) {
+			// If this asteroid is to be drawn (mass!=0) and is below the screen...
+			if (asteroid_arr[i].mass != 0 && get_display_coordinates(&asteroid_arr[i]).y > 170) {
+				// Put its index back in the stack of asteroids we can use again
 				stack_push(&asteroid_stack, i);
+				// Set the "unused asteroid" flag - mass = 0.
 				// If the mass is zero, then we'll skip drawing.
 				asteroid_arr[i].mass = 0;
 			}
@@ -249,10 +253,25 @@ GameStatus game_test(uint8_t level)
 			buffer_star(star_arr[i].posX, star_arr[i].posY);
 		}
 		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
+			// Our flag for "unused asteroid" is a mass of zero.
+			// If this element is unused, don't draw it.
 			if (asteroid_arr[i].mass == 0) continue;
-			buffer_circle(asteroid_arr[i].posX/1000, asteroid_arr[i].posY/1000, asteroid_arr[i].mass / 1000, 255);
+
+			// Get the coordinates on the screen of the asteroid:
+			Point aster_pt = get_display_coordinates(&asteroid_arr[i]);
+
+			// If these coordinates are off the screen, don't attempt to render anything.
+			if (aster_pt.x < 0 || aster_pt.x > 128 || aster_pt.y < 0 || aster_pt.y > 160)
+				continue;
+
+			// Else, actually render the asteroid. It may be half off the screen, but
+			// that will be fixed by buffer_circle().
+			buffer_circle(aster_pt.x, aster_pt.y, asteroid_arr[i].mass / 1000, 255);
 		}
 		// The asteroids are in the foreground.
+		//
+		// TODO draw the ship here
+		// Write the buffer to the display.
 		buffer_write();
 
 		// TODO Check if the level is over. If so, return!
