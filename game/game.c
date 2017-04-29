@@ -310,11 +310,19 @@ GameStatus game_test(uint8_t level)
 			// check the collision
 			if (check_collision(&ship, &asteroid_arr[i], 20000, 20000, asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
 				buffer_string(0, 0, "Collision", buffer_color(255, 0, 0));
+				// Since we know the collision has occurred,
+				// make sure we get rid of the asteroid
+				// so the same asteroid doesn't cause multiple collisions.
+				asteroid_arr[i].mass = 0;
+				stack_push(&asteroid_stack, i);
+
+				// Decrement the ship's health.
+				ship_health--;
+				// The ship can't collide with multiple things in one frame:
+				break;
 			}
 			// if collision is true, then decrement health
 		}
-		// Write the buffer to the display.
-		buffer_write();
 
 		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
 			if (bonus_arr[i].type == BONUS_UNUSED) continue;
@@ -322,6 +330,12 @@ GameStatus game_test(uint8_t level)
 			// if collision is true, do somethign
 			// depending on what type of bonus
 		}
+		// Display the health:
+		for (int i = 0; i < ship_health; i++) {
+			buffer_string(2+i*6, 150, "\3", buffer_color(255,0,0));
+		}
+		// Write the buffer to the display.
+		buffer_write();
 		// TODO Check if the player is still alive.
 		// If dead, return game over.
 

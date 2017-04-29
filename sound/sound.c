@@ -105,6 +105,9 @@ void Sound_Init(uint8_t song_index){
 }
 
 void Sound_Play(uint32_t period){
+	if (period == 0) {
+		DAC_Out(0);
+	}
 	TIMER1_TAILR_R = period-1;		//time0A calls Sound_Play with the reload value for Timer1A according to the note to be played
 } 
 
@@ -136,9 +139,7 @@ void timer0A_song(void){
 
 void timer1_play(){
 	//this is similar to the systick handler from lab6, this will call DAC_Out
-	portf_toggle(3);
 	Index = (Index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
 	DAC_Out(sine_lookup6[Index]);
-	portf_toggle(3);
 }
 
