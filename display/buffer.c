@@ -67,14 +67,16 @@ void buffer_fill(uint8_t color) {
 
 // Draw a circle into the buffer.
 // Only parts of the circle which are on the screen will be drawn.
-// Inputs: int x - the X coordinate of the center of the circle
-// int y - the Y coordinate of the center of the circle
+// Inputs: int x - the X coordinate of the top left corner of the circle
+// int y - the Y coordinate of the top left corner of the circle
 // int r - the radius of the circle
 void buffer_circle(int16_t x, int16_t y, int16_t r, uint8_t color) {
-	int xStart = drawing_max(x-r, 0);
-	int xEnd = drawing_min(x+r, DISPLAY_WIDTH);
-	int yStart = drawing_max(y-r, 0);
-	int yEnd = drawing_min(y+r, DISPLAY_HEIGHT);
+	int xStart = drawing_max(x, 0);
+	int xEnd = drawing_min(x+2*r, DISPLAY_WIDTH);
+	int yStart = drawing_max(y, 0);
+	int yEnd = drawing_min(y+2*r, DISPLAY_HEIGHT);
+	x = x+r;
+	y = y+r;
 	for (int i = xStart; i < xEnd; i++) {
 		for (int j = yStart; j < yEnd; j++) {
 			if ((i-x)*(i-x)+(j-y)*(j-y) <= r*r) {

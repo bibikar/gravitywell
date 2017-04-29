@@ -108,17 +108,12 @@ Point get_display_coordinates(Entity *e) {
 uint8_t check_collision(Entity *e1, Entity *e2, uint16_t w1, uint16_t h1, uint16_t w2, uint16_t h2){
 	//entity has the properties: mass, velX, velY, posX, posY, here position is the top left coordinates
 	int32_t flag=0;	//flag will be 1 if the rectangles overlap 
-	if((e2->posY > e1->posY ) &&((e2->posY) < (e1->posY+h1)))
-		flag = 1;
-	else if (((e2->posY+h2) > e1->posY) &&((e2->posY+h2) < (e1->posY+h1)))
-		flag=1;
-	else if ((e2->posX < (e1->posX+w1)) && (e2->posX>e1->posX))
-		flag=1;
-	else if (((e2->posX+w2) > (e1->posX+w1)) && ((e2->posX+w2) < (e1->posX)))
-		flag = 1;
-	else
-		flag = 0;
-	return flag;
+	
+	if ((e1->posX >= e2->posX && e1->posX <= e2->posX + w2) || (e2->posX >= e1->posX && e2->posX <= e1->posX + w1))
+		flag |= 1;
+	if ((e1->posY >= e2->posY && e1->posY <= e2->posY + h2) || (e2->posY >= e1->posY && e2->posY <= e1->posY + h1))
+		flag |= 2;
+	return flag == 3;
 }
 
 
@@ -161,7 +156,7 @@ GameStatus game_test(uint8_t level)
 	ship.posX = 0;
 	ship.posY = 0; // starting position
 	ship.velX = 0;
-	ship.velY = -10; // the ship moves upwards
+	ship.velY = -50; // the ship moves upwards
 	ship_health = 3;
 	if (level == 1) score = 0; // only clear the score if new game
 	
@@ -211,7 +206,7 @@ GameStatus game_test(uint8_t level)
 		}
 
 		// TODO Poll the potentiometer(s)
-		int32_t thruster_force = adc_poll(); // TODO get this from potentiometer
+		int32_t thruster_force = adc_poll()/16; // TODO get this from potentiometer
 
 
 		// Calculate the force:
@@ -305,8 +300,6 @@ GameStatus game_test(uint8_t level)
 		// TODO Show how much health is left in the ship:
 		// For this, we can print the heart characters in red, top left corner.
 
-		// Write the buffer to the display.
-		buffer_write();
 
 		// TODO Check if the level is over. If so, return!
 		// TODO Check collisions.
@@ -315,8 +308,14 @@ GameStatus game_test(uint8_t level)
 		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
 			if (asteroid_arr[i].mass == 0) continue;
 			// check the collision
+			if (check_collision(&ship, &asteroid_arr[i], 20000, 20000, asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
+				buffer_string(0, 0, "Collision", buffer_color(255, 0, 0));
+				buffer_write();
+			}
 			// if collision is true, then decrement health
 		}
+		// Write the buffer to the display.
+		buffer_write();
 
 		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
 			if (bonus_arr[i].type == BONUS_UNUSED) continue;
