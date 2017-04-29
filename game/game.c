@@ -310,7 +310,6 @@ GameStatus game_test(uint8_t level)
 			// check the collision
 			if (check_collision(&ship, &asteroid_arr[i], 20000, 20000, asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
 				buffer_string(0, 0, "Collision", buffer_color(255, 0, 0));
-				buffer_write();
 			}
 			// if collision is true, then decrement health
 		}
