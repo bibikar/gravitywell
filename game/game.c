@@ -106,20 +106,16 @@ Point get_display_coordinates(Entity *e) {
 // w2, h2 - dimensions of e2
 // Entity has mass, velX, velY, posX, posY
 uint8_t check_collision(Entity *e1, Entity *e2, uint16_t w1, uint16_t h1, uint16_t w2, uint16_t h2){
-	/*
-    A's Left Edge to left of B's right edge, [RectA.Left < RectB.Right], and
-    A's right edge to right of B's left edge, [RectA.Right > RectB.Left], and
-    A's top above B's bottom, [RectA.Top > RectB.Bottom], and
-    A's bottom below B's Top [RectA.Bottom < RectB.Top]
-	*/
 	//entity has the properties: mass, velX, velY, posX, posY, here position is the top left coordinates
 	int32_t flag=0;	//flag will be 1 if the rectangles overlap 
-	if((e2->posY < e1->posY ) &&((e2->posY+h2) > (e1->posY+h1)))
+	if((e2->posY > e1->posY ) &&((e2->posY) < (e1->posY+h1)))
 		flag = 1;
-	else if ((e2->posY > e1->posY) &&((e2->posY+h2) < (e1->posY+h1)))
+	else if (((e2->posY+h2) > e1->posY) &&((e2->posY+h2) < (e1->posY+h1)))
 		flag=1;
-	else if ((e2->posX < (e1->posX+w1)) && ((e2->posX+w2)>e1->posX))
+	else if ((e2->posX < (e1->posX+w1)) && (e2->posX>e1->posX))
 		flag=1;
+	else if (((e2->posX+w2) > (e1->posX+w1)) && ((e2->posX+w2) < (e1->posX)))
+		flag = 1;
 	else
 		flag = 0;
 	return flag;
