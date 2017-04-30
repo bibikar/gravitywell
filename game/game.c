@@ -11,6 +11,7 @@
 #include "../math/random.h"
 #include "../math/random_squares.h"
 #include "../input/ADC.h"
+#include "../sound/sound.h"
 #define EVENT_QUEUE_SIZE 8
 #define STAR_STACK_SIZE 128
 #define ASTEROID_STACK_SIZE 64
@@ -194,7 +195,7 @@ GameStatus game_test(uint8_t level)
 			portf_toggle(3);
 			uint32_t event = queue_poll(&event_queue);
 			if (event == 0) {
-
+				Sound_Init(1);
 				// This means we've entered the pause menu.
 				// Print the pause message and continue, with a box around the former.
 				buffer_rect(PAUSE_MESSAGE_X - 4, PAUSE_MESSAGE_Y - 4, 72, 14, 0);
@@ -209,6 +210,7 @@ GameStatus game_test(uint8_t level)
 					while (queue_empty(&event_queue)) {}
 					event = queue_poll(&event_queue);
 				} while (event == 0);
+				Sound_Init(0);
 				buffer_clear();
 				time = systick_getms();
 			}
