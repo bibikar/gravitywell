@@ -248,7 +248,6 @@ void timer0A_song(void){
 		else Sound_Play(note_lookup[current_note.pitch]);
 		// since we have a new note, get Sound.c to play it
   }
-	portf_toggle(2);
 	
 }
 

@@ -22,6 +22,15 @@
 
 #define SHIP_DISPLAY_X 55
 #define SHIP_DISPLAY_Y 120
+#define SHIP_WIDTH_PHYSICS 20000
+#define SHIP_HEIGHT_PHYSICS 20000
+
+#define BONUS_WIDTH_PHYSICS 10000
+#define BONUS_HEIGHT_PHYSICS 10000
+#define BONUS_WIDTH_DISPLAY BONUS_WIDTH_PHYSICS/1000
+#define BONUS_HEIGHT_DISPLAY BONUS_HEIGHT_PHYSICS/1000
+#define BONUS_SCORE_AMOUNT 100
+
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
 
@@ -302,27 +311,15 @@ GameStatus game_test(uint8_t level)
 
 
 		// TODO Check if the level is over. If so, return!
-		if (ship_health < 1) {
-			buffer_string(36, 48, "GAME OVER", buffer_color(255, 0, 0));
-			buffer_rect_outline(36 - 4, 48 - 4, 60, 14, buffer_color(255,0,0));
-			buffer_string(0, 64, "      You died!", buffer_color(255, 0, 0));
-			buffer_string(0, 80, "        Score:", buffer_color(255, 0, 0));
-			// TODO Output score here.
-			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
-			buffer_string(0, 144, "  exit to main menu", buffer_color(255, 255, 0));
-			buffer_write();
-			while (queue_empty(&event_queue)) {}
-			portf_disable_interrupts();
-			GameStatus ret = {0, score};
-			return ret;
-		}
-		// TODO Check collisions.
+		// Check collisions:
 		
 		// Check if the player collided with asteroids:
 		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
 			if (asteroid_arr[i].mass == 0) continue;
 			// check the collision
-			if (check_collision(&ship, &asteroid_arr[i], 20000, 20000, asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
+			if (check_collision(&ship, &asteroid_arr[i], SHIP_WIDTH_PHYSICS, SHIP_HEIGHT_PHYSICS,
+				 asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
+
 				buffer_string(0, 0, "Collision", buffer_color(255, 0, 0));
 				// Since we know the collision has occurred,
 				// make sure we get rid of the asteroid
@@ -338,20 +335,57 @@ GameStatus game_test(uint8_t level)
 			// if collision is true, then decrement health
 		}
 
+		// Check if the player collided with bonuses:
 		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
 			if (bonus_arr[i].type == BONUS_UNUSED) continue;
 			// check the collision
-			// if collision is true, do somethign
-			// depending on what type of bonus
+			Entity bonus_e;
+			bonus_e.posX = bonus_arr[i].posX;
+			bonus_e.posY = bonus_arr[i].posY;
+
+			if (check_collision(&ship, &bonus_e, SHIP_WIDTH_PHYSICS, SHIP_HEIGHT_PHYSICS,
+				BONUS_WIDTH_PHYSICS, BONUS_HEIGHT_PHYSICS)) {
+
+				// We collided with a bonus.
+				switch(bonus_arr[i].type) {
+				case BONUS_HEALTH:
+					ship_health++;
+					break;
+				case BONUS_SCORE:
+					score += BONUS_SCORE_AMOUNT;
+					break;
+				}
+
+				// Get rid of the bonus.
+				bonus_arr[i].type = BONUS_UNUSED;
+				stack_push(&bonus_stack, i);
+			}
+
 		}
 		// Display the health:
 		for (int i = 0; i < ship_health; i++) {
 			buffer_string(2+i*6, 150, "\3", buffer_color(255,0,0));
 		}
+
+		// Check if the player is still alive.
+		// If dead, return game over.
+		if (ship_health < 1) {
+			buffer_string(36, 48, "GAME OVER", buffer_color(255, 0, 0));
+			buffer_rect_outline(36 - 4, 48 - 4, 60, 14, buffer_color(255,0,0));
+			buffer_string(0, 64, "      You died!", buffer_color(255, 0, 0));
+			buffer_string(0, 80, "        Score:", buffer_color(255, 0, 0));
+			// TODO Output score here.
+			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
+			buffer_string(0, 144, "  exit to main menu", buffer_color(255, 255, 0));
+			buffer_write();
+			while (queue_empty(&event_queue)) {}
+			portf_disable_interrupts();
+			GameStatus ret = {0, score};
+			return ret;
+		}
+
 		// Write the buffer to the display.
 		buffer_write();
-		// TODO Check if the player is still alive.
-		// If dead, return game over.
 
 		// Generate new asteroids and shooting stars:
 		if (!stack_empty(&star_stack)) {

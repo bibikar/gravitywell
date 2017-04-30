@@ -68,12 +68,10 @@ void portf_disable_interrupts() {
 
 void GPIOPortF_Handler() {
 	if (systick_getms() - ms1 < 10) {
-		portf_toggle(3);
 		GPIO_PORTF_ICR_R = 0x11;
 		return;
 		// If the button was pushed twice in 10 ms we can just ignore it.
 	}
-	portf_toggle(2);
 	Queue *event_queue = get_event_queue();
 	if (GPIO_PORTF_RIS_R & 0x01) {
 		queue_offer(event_queue, 0);
