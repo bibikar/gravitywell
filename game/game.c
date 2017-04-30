@@ -20,8 +20,8 @@
 #define ASTEROID_SPAWN_FRAMES 10
 #define BONUS_PER_LEVEL 3
 
-#define SHIP_DISPLAY_X 60
-#define SHIP_DISPLAY_Y 40
+#define SHIP_DISPLAY_X 55
+#define SHIP_DISPLAY_Y 120
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
 
@@ -302,6 +302,20 @@ GameStatus game_test(uint8_t level)
 
 
 		// TODO Check if the level is over. If so, return!
+		if (ship_health < 1) {
+			buffer_string(36, 48, "GAME OVER", buffer_color(255, 0, 0));
+			buffer_rect_outline(36 - 4, 48 - 4, 60, 14, buffer_color(255,0,0));
+			buffer_string(0, 64, "      You died!", buffer_color(255, 0, 0));
+			buffer_string(0, 80, "        Score:", buffer_color(255, 0, 0));
+			// TODO Output score here.
+			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
+			buffer_string(0, 144, "  exit to main menu", buffer_color(255, 255, 0));
+			buffer_write();
+			while (queue_empty(&event_queue)) {}
+			portf_disable_interrupts();
+			GameStatus ret = {0, score};
+			return ret;
+		}
 		// TODO Check collisions.
 		
 		// Check if the player collided with asteroids:
