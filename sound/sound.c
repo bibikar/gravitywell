@@ -24,6 +24,7 @@ typedef struct note {
 typedef struct song {
 	const Note * const note_arr;
 	uint32_t length;
+	uint32_t delay;
 } Song;
 
 const Note const yankee[32] = {
@@ -94,10 +95,87 @@ const Note const harry_potter[31] = {
 	{69, 7},
 	{60, 3}
 };
+
+const Note const test_song[] = {
+	{67, 8},
+	{74, 8},
+	{70, 12},
+	{69, 4},
+	{67, 4},
+	{70, 4},
+	{69, 4},
+	{67, 4},
+	{66, 4},
+	{69, 4},
+	{62, 8},
+	{67, 4},
+	{62, 4},
+	{69, 4},
+	{62, 4},
+	{70, 4},
+	{69, 2},
+	{67, 2},
+	{69, 4},
+	{62, 4},
+	{67, 4},
+	{62, 2},
+	{67, 2},
+	{69, 4},
+	{62, 2},
+	{69, 2},
+	{70, 4},
+	{69, 2},
+	{67, 2},
+	{69, 2},
+	{62, 2},
+	{74, 2},
+	{72, 2},
+	{70, 2},
+	{69, 2},
+	{67, 2},
+	{70, 2},
+	{69, 2},
+	{67, 2},
+	{66, 2},
+	{69, 2},
+	{67, 2},
+	{62, 2},
+	{67, 2},
+	{69, 2},
+	{70, 2},
+	{72, 2},
+	{74, 2},
+	
+	
+};	
+	
+// Mendelssohn, violin concerto op. 64, third movement
+const Note const victory[] = {
+	{68, 2}, {71, 2}, {76, 2}, {80, 2},
+	{83, 4}, {82, 2}, {85, 2},
+	{83, 2}, {0, 2}, {88, 2}, {0, 2},
+	{83, 2}, {0, 2}, {80, 2}, {0, 2},
+	{76, 2}, {0, 2}, {78, 2}, {0, 2},
+	{80, 4}, {79, 2}, {81, 2},
+	{80, 2}, {0, 2}, {83, 2}, {0, 2},
+	{80, 2}, {0, 2}, {76, 2}, {0, 2},
+	{71, 2}, {0, 2}, {75, 2}, {73, 2},
+	
+	{71, 3}, {0, 1}, {78, 2}, {75, 2},
+	{71, 3}, {0, 1}, {75, 2}, {73, 2},
+	{71, 3}, {0, 1}, {78, 2}, {75, 2},
+	{71, 3}, {0, 1}, {75, 2}, {73, 2},
+	{71, 3}, {0, 1}, {71, 2}, {73, 2},
+	{75, 2}, {76, 2}, {78, 2}, {80, 2},
+	{81, 2}, {78, 2}, {75, 2}, {69, 2},
+};
+	
 	
 const Song songs[] = {
-	{yankee, 32},
-	{harry_potter, 31}
+	{victory, 62, 4000000},
+	{test_song, 47, 5000000},
+	{yankee, 32, 10000000},
+	{harry_potter, 31, 10000000}
 };
 
 Note *song_notes;
@@ -110,7 +188,7 @@ uint32_t song_length;
 
 static int32_t current_note_index;
 static int32_t current_note_duration_left;
-static uint32_t song_timer_delay = 10000000;
+static uint32_t song_timer_delay;
 static uint8_t Index;
 //Index is for the sine_lookup - to find the values for the sine wave
 uint8_t get_index(void){
@@ -128,6 +206,7 @@ void Sound_Init(uint8_t song_index){
 	Song *next_song = (Song *) &songs[song_index];
 	song_notes = (Note *) next_song->note_arr;
 	song_length = (uint32_t) next_song->length;
+	song_timer_delay = next_song->delay;
 
 	// Reset the index of the sine lookup
 	Index = 0;
@@ -143,7 +222,7 @@ void Sound_Init(uint8_t song_index){
 
 void Sound_Play(uint32_t period){
 	if (period == 0) {
-		DAC_Out(0);
+		DAC_Out(31);
 	}
 	TIMER1_TAILR_R = period-1;		//time0A calls Sound_Play with the reload value for Timer1A according to the note to be played
 } 
@@ -167,7 +246,8 @@ void timer0A_song(void){
 	  // If this is true, we just got a new note.
 		current_note_duration_left = current_note.duration;
 		// get the new duration to last the note for
-		Sound_Play(note_lookup[current_note.pitch]);
+		if (current_note.pitch == 0) Sound_Play(0);
+		else Sound_Play(note_lookup[current_note.pitch]);
 		// since we have a new note, get Sound.c to play it
   }
 	portf_toggle(2);
