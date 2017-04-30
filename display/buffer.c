@@ -223,3 +223,16 @@ void buffer_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const unsigned sh
 	}
 }
 	
+void buffer_num(int16_t x, int16_t y, int32_t n, uint8_t color){
+	int32_t factor=10000, quo, rem, flag=1;
+	do{
+			if((flag==1)&&(n/factor==0)==0)	{
+				buffer_char(x,y,(n/factor), color);
+				x+=6;	//each character is 6 pixels wide
+				flag=1;
+			}
+			factor/=10;
+			quo = n/factor;
+			n = n - (quo*factor);		
+		}while((n-(quo*factor))!=0);
+}
