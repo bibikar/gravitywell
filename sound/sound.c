@@ -14,6 +14,8 @@
 #include "../sound/sound_lookup.h"
 #include "../input/portf.h"
 
+#include "../display/ST7735.h"
+#include "../display/print.h"
 typedef struct note {
 	uint8_t pitch;
 	uint8_t duration;
@@ -59,22 +61,24 @@ const Note const yankee[32] = {
 	{60, 3}
 };
 
-const Song songs[] = {
+const Song yankees = {yankee, 32};
+
+const Song const songs[] = {
 	{yankee, 32}
 };
 
-Note *song_notes = (Note *)yankee;
-uint32_t song_length=32;
+static Note *song_notes;
+static uint32_t song_length;
 
 
 //note_lookup has the systick reload values
 	
 //sine_lookup is the lookup table for the values of the sine wave
 
-int32_t current_note_index=0;
-int32_t current_note_duration_left=0;
-uint32_t song_timer_delay = 10000000;
-uint8_t Index;
+static int32_t current_note_index;
+static int32_t current_note_duration_left;
+static uint32_t song_timer_delay = 10000000;
+static uint8_t Index;
 //Index is for the sine_lookup - to find the values for the sine wave
 uint8_t get_index(void){
 	return Index;
@@ -90,7 +94,7 @@ void Sound_Init(uint8_t song_index){
 	// Update the song pointer and the length
 	Song *next_song = (Song *) &songs[song_index];
 	song_notes = (Note *) next_song->note_arr;
-	song_length = next_song->length;
+	song_length = (uint32_t) next_song->length;
 
 	// Reset the index of the sine lookup
 	Index = 0;
