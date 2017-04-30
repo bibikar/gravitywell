@@ -363,7 +363,7 @@ GameStatus game_test(uint8_t level)
 
 		if (!stack_empty(&asteroid_stack)) {
 			// TODO add a condition here: only spawn new asteroids when we want to
-			if (++asteroid_spawn_index % (srandom() % ASTEROID_SPAWN_FRAMES) == 0) {
+			if (++asteroid_spawn_index % (ASTEROID_SPAWN_FRAMES) == 0) {
 				uint16_t asteroid_index = stack_pop(&asteroid_stack);
 				asteroid_arr[asteroid_index].posX = ship.posX + srandom() % 160000 - 80000;
 				asteroid_arr[asteroid_index].posY = ship.posY - SHIP_DISPLAY_Y*1000 - srandom() % 10000;
