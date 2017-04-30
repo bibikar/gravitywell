@@ -118,7 +118,7 @@ void timer0A_song(void){
 	if (--current_note_duration_left <= 0) {
 	  // Decrement this and check if the note is over already.
 	  // If so, we need to get the next note.
-		if(current_note_index==song_length)
+		if(current_note_index==(song_length-1))
 			current_note_index=0;
 		else
 			current_note_index++;
@@ -140,6 +140,6 @@ void timer0A_song(void){
 void timer1_play(){
 	//this is similar to the systick handler from lab6, this will call DAC_Out
 	Index = (Index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
-	DAC_Out(sine_lookup6[Index]);
+	DAC_Out(sine_lookup4[Index]);
 }
 
