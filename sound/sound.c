@@ -14,8 +14,6 @@
 #include "../sound/sound_lookup.h"
 #include "../input/portf.h"
 
-#include "../display/ST7735.h"
-#include "../display/print.h"
 typedef struct note {
 	uint8_t pitch;
 	uint8_t duration;
