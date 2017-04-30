@@ -61,14 +61,47 @@ const Note const yankee[32] = {
 	{60, 3}
 };
 
-const Song yankees = {yankee, 32};
-
-const Song const songs[] = {
-	{yankee, 32}
+const Note const harry_potter[31] = {
+	{64, 3},
+	{69, 3},
+	{72, 3},
+	{71, 3},
+	{69, 4},
+	{76, 3},
+	{74, 5},
+	{71, 5},
+	{69, 3},
+	{72, 3},
+	{71, 3},
+	{67, 4},
+	{70, 3},
+	{64, 7},
+	{64, 3},
+	{69, 3},
+	{72, 3},
+	{71, 3},
+	{69, 4},
+	{76, 3},
+	{79, 4},
+	{78, 3},
+	{77, 4},
+	{73, 3},
+	{77, 3},
+	{76, 3},
+	{75, 3},
+	{63, 4},
+	{72, 3},
+	{69, 7},
+	{60, 3}
+};
+	
+const Song songs[] = {
+	{yankee, 32},
+	{harry_potter, 31}
 };
 
-static Note *song_notes;
-static uint32_t song_length;
+Note *song_notes;
+uint32_t song_length;
 
 
 //note_lookup has the systick reload values
@@ -144,6 +177,6 @@ void timer0A_song(void){
 void timer1_play(){
 	//this is similar to the systick handler from lab6, this will call DAC_Out
 	Index = (Index+1)&0x1F;      // 4,5,6,7,7,7,6,5,4,3,2,1,1,1,2,3,...
-	DAC_Out(sine_lookup4[Index]);
+	DAC_Out(sine_lookup6[Index]);
 }
 
