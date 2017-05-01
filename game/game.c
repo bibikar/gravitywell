@@ -19,7 +19,7 @@
 
 #define STARS_PER_FRAME 3
 #define ASTEROID_SPAWN_FRAMES 10
-#define BONUS_PER_LEVEL 3
+#define BONUS_SPAWN_FRAMES 100
 
 #define SHIP_DISPLAY_X 55
 #define SHIP_DISPLAY_Y 120
@@ -55,10 +55,12 @@ typedef struct star_struct {
 // BONUS_HEALTH: repairs the player's ship immediately
 // BONUS_ATTACK: allows the player to fire a projectile which destroys asteroids
 // BONUS_SCORE: grants the player a score bonus
+// BONUS_ERASE: allows the player to erase all asteroids in the field
 typedef enum bonus_type {
 	BONUS_UNUSED,
 	BONUS_HEALTH,
 	BONUS_ATTACK,
+	BONUS_ERASE,
 	BONUS_SCORE
 } BonusType;
 
@@ -308,9 +310,6 @@ GameStatus game_test(uint8_t level)
 		Point ship_pt = get_display_coordinates(&ship);
 		buffer_circle(ship_pt.x, ship_pt.y, 10, buffer_color(255, 0, 0));
 
-		// TODO Show how much health is left in the ship:
-		// For this, we can print the heart characters in red, top left corner.
-
 
 		// TODO Check if the level is over. If so, return!
 		// Check collisions:
@@ -356,6 +355,15 @@ GameStatus game_test(uint8_t level)
 				case BONUS_SCORE:
 					score += BONUS_SCORE_AMOUNT;
 					break;
+				case BONUS_ATTACK:
+					// TODO Grant the player one attack
+					break;
+				case BONUS_ERASE:
+					// TODO Grant the player one erase
+					break;
+				default:
+					// do nothing
+					break;
 				}
 
 				// Get rid of the bonus.
@@ -372,14 +380,26 @@ GameStatus game_test(uint8_t level)
 		// Check if the player is still alive.
 		// If dead, return game over.
 		if (ship_health < 1) {
+			// Display GAME OVER with a box
 			buffer_string(36, 48, "GAME OVER", buffer_color(255, 0, 0));
 			buffer_rect_outline(36 - 4, 48 - 4, 60, 14, buffer_color(255,0,0));
+
+			// Display you died and score
 			buffer_string(0, 64, "      You died!", buffer_color(255, 0, 0));
 			buffer_string(0, 80, "        Score:", buffer_color(255, 0, 0));
-			// TODO Output score here.
+			buffer_num(0, 96, score, buffer_color(255, 0, 0));
+
+			// Cue to push button
 			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
 			buffer_string(0, 144, "  exit to main menu", buffer_color(255, 255, 0));
+			
+			// Write new buffer
 			buffer_write();
+
+			// Wait for event queue to get something, then
+			// disable the GPIO interrupts. 
+			// We then finally return the GameStatus saying
+			// to go back to the main menu.
 			while (queue_empty(&event_queue)) {}
 			portf_disable_interrupts();
 			GameStatus ret = {0, score};
@@ -400,14 +420,44 @@ GameStatus game_test(uint8_t level)
 		if (!stack_empty(&asteroid_stack)) {
 			// TODO add a condition here: only spawn new asteroids when we want to
 			if (++asteroid_spawn_index % (ASTEROID_SPAWN_FRAMES) == 0) {
+				// Spawn one asteroid above the player
 				uint16_t asteroid_index = stack_pop(&asteroid_stack);
 				asteroid_arr[asteroid_index].posX = ship.posX + srandom() % 160000 - 80000;
 				asteroid_arr[asteroid_index].posY = ship.posY - SHIP_DISPLAY_Y*1000 - srandom() % 10000;
 				asteroid_arr[asteroid_index].velX = 0;
 				asteroid_arr[asteroid_index].velY = 0;
+				asteroid_arr[asteroid_index].mass = 4000;
+
+				// Spawn one asteroid to the side of the player
+				asteroid_index = stack_pop(&asteroid_stack);
+				// Make it relative to the player, either to the left or right (positive or negative)
+				// of a random X
+				// This way the player cna't just go left or right.
+				asteroid_arr[asteroid_index].posX = ship.posX + ((srandom() % 2) * 2 - 1) * (srandom() % 80000 + 64000);
+				asteroid_arr[asteroid_index].posY = ship.posY - srandom() % 64000;
+				asteroid_arr[asteroid_index].velX = 0;
+				asteroid_arr[asteroid_index].velY = 0;
 				asteroid_arr[asteroid_index].mass = 5000;
+				
 			}
 			// TODO fill these with random values which make sense
+		}
+
+		// Generate new bonuses
+		if (!stack_empty(&bonus_stack)) {
+			if (++asteroid_spawn_index % BONUS_SPAWN_FRAMES == 0) {
+				// Spawn bonuses randomly. Some have better chances than others.
+				uint16_t bonus_index = stack_pop(&bonus_stack);
+				bonus_arr[bonus_index].posX = ship.posX + srandom() % 160000 - 80000;
+				bonus_arr[bonus_index].posY = ship.posY - SHIP_DISPLAY_Y*1000 - srandom() % 10000;
+				bonus_arr[bonus_index].type = BONUS_SCORE; // by default, we'll just spawn score objects
+				
+				// Assign bonus types by random:
+				uint16_t chooser = srandom() % 1000;
+				if (chooser < 300) bonus_arr[bonus_index].type = BONUS_HEALTH;
+				else if (chooser < 200) bonus_arr[bonus_index].type = BONUS_ATTACK;
+				else if (chooser < 50) bonus_arr[bonus_index].type = BONUS_ERASE;
+			}
 		}
 	}
 	portf_disable_interrupts();

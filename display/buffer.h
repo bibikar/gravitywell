@@ -16,3 +16,4 @@ void buffer_star(int16_t, int16_t);
 void buffer_char(int16_t, int16_t, char, uint8_t);
 void buffer_string(int16_t, int16_t, char*, uint8_t);
 void buffer_write();
+void buffer_num(int16_t, int16_t, int32_t, uint8_t);
