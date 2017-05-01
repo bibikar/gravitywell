@@ -15,11 +15,13 @@
 #define EVENT_QUEUE_SIZE 8
 #define STAR_STACK_SIZE 128
 #define ASTEROID_STACK_SIZE 64
-#define BONUS_STACK_SIZE 64
+#define BONUS_STACK_SIZE 16
+#define MISSILE_STACK_SIZE 8
 
 #define STARS_PER_FRAME 3
 #define ASTEROID_SPAWN_FRAMES 10
 #define BONUS_SPAWN_FRAMES 100
+#define MISSILE_VELOCITY_MULTIPLIER 3
 
 #define SHIP_DISPLAY_X 55
 #define SHIP_DISPLAY_Y 120
@@ -32,6 +34,9 @@
 #define BONUS_WIDTH_DISPLAY BONUS_WIDTH_PHYSICS/1000
 #define BONUS_HEIGHT_DISPLAY BONUS_HEIGHT_PHYSICS/1000
 #define BONUS_SCORE_AMOUNT 100
+
+#define MISSILE_WIDTH_PHYSICS 1000
+#define MISSILE_HEIGHT_PHYSICS 10000
 
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
@@ -100,6 +105,10 @@ Stack bonus_stack;
 static Bonus bonus_arr[BONUS_STACK_SIZE];
 static uint32_t bonus_spawn_index = 0;
 
+static uint16_t missile_stack_arr[MISSILE_STACK_SIZE];
+Stack missile_stack;
+static Entity missile_arr[MISSILE_STACK_SIZE];
+
 static Entity ship;
 static uint8_t ship_health;
 static uint32_t score;
@@ -158,6 +167,17 @@ GameStatus game_test(uint8_t level)
 		asteroid_arr[i].mass = 0;
 	}
 
+	// Initialize the Missile stack and entities.
+	// Again using millipixels.
+	stack_init(&missile_stack, missile_stack_arr, MISSILE_STACK_SIZE);
+	for (int i = 0; i < MISSILE_STACK_SIZE; i++) {
+		missile_arr[i].posX = 0;
+		missile_arr[i].posY = 0;
+		missile_arr[i].velX = 0;
+		missile_arr[i].velX = 0;
+		missile_arr[i].mass = 0;
+	}
+
 	// Initialize the Bonus stack and entities.
 	// Using millipixels as the unit
 	stack_init(&bonus_stack, bonus_stack_arr, BONUS_STACK_SIZE);
@@ -203,25 +223,29 @@ GameStatus game_test(uint8_t level)
 		while (!queue_empty(&event_queue)) {
 			portf_toggle(3);
 			uint32_t event = queue_poll(&event_queue);
-			if (event == 0) {
-				Sound_Init(1);
-				// This means we've entered the pause menu.
-				// Print the pause message and continue, with a box around the former.
-				buffer_rect(PAUSE_MESSAGE_X - 4, PAUSE_MESSAGE_Y - 4, 72, 14, 0);
-				buffer_string(PAUSE_MESSAGE_X,PAUSE_MESSAGE_Y,"GAME PAUSED",buffer_color(0,0,255));
-				buffer_rect_outline(PAUSE_MESSAGE_X - 4, PAUSE_MESSAGE_Y - 4, 72, 14, buffer_color(0,0,255));
-				buffer_rect(72, 147, 50, 13, 0);
-				buffer_string(75, 150, "Continue", buffer_color(0, 0, 255));
-				buffer_write();
-				
-				// Don't exit until PF4 is pressed.
-				do { 
-					while (queue_empty(&event_queue)) {}
-					event = queue_poll(&event_queue);
-				} while (event == 0);
-				Sound_Init(0);
-				buffer_clear();
-				time = systick_getms();
+			if (event == 0 && missiles) {
+				// Fire a missile
+
+				missiles--;
+				Entity missile;
+				missile.posX = ship.posX;
+				missile.posY = ship.posY;
+				missile.velX = ship.velX;
+				missile.velY = ship.velY * MISSILE_VELOCITY_MULTIPLIER;
+				missile.mass = 1000;
+
+				uint16_t missile_index = stack_pop(&missile_stack);
+				missile_arr[missile_index] = missile;
+			}
+			else if (event == 4 && bombs) {
+				// Erase all asteroids.
+				bombs = 0; // get rid of bombs
+				for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
+					if (asteroid_arr[i].mass != 0) {
+						asteroid_arr[i].mass = 0;
+						stack_push(&asteroid_stack, i);
+					}
+				}
 			}
 		}
 
@@ -270,6 +294,9 @@ GameStatus game_test(uint8_t level)
 		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
 			update_position(&asteroid_arr[i], dt);
 		}
+		for (int i = 0; i < MISSILE_STACK_SIZE; i++) {
+			update_position(&missile_arr[i], dt);
+		}
 
 		// Update the ship position
 		update_position(&ship, dt);
@@ -290,6 +317,16 @@ GameStatus game_test(uint8_t level)
 				// Set the "unused asteroid" flag - mass = 0.
 				// If the mass is zero, then we'll skip drawing.
 				asteroid_arr[i].mass = 0;
+			}
+		}
+		for (uint16_t i = 0; i < MISSILE_STACK_SIZE; i++) {
+			// If this missile is to be drawn (mass!=0) and is below the screen...
+			if (missile_arr[i].mass != 0 && get_display_coordinates(&missile_arr[i]).y > 300) {
+				// Put its index back in the stack of missiles we can use again
+				stack_push(&missile_stack, i);
+				// Set the "unused missile" flag - mass = 0.
+				// If the mass is zero, then we'll skip drawing.
+				missile_arr[i].mass = 0;
 			}
 		}
 		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
@@ -349,7 +386,23 @@ GameStatus game_test(uint8_t level)
 			// that will be fixed by buffer_circle().
 			buffer_circle(aster_pt.x, aster_pt.y, asteroid_arr[i].mass / 1000, 255);
 		}
-		// The asteroids are in the foreground.
+
+		// Draw missiles
+		for (int i = 0; i < MISSILE_STACK_SIZE; i++) {
+			// If unused, don't draw
+			if (missile_arr[i].mass == 0) continue;
+
+			// Get display coordinates:
+			Point missile_pt = get_display_coordinates(&missile_arr[i]);
+
+			// If these coordinates are off the screen, don't attempt to render anything.
+			if (missile_pt.x < 0 || missile_pt.x > 128 || missile_pt.y < 0 || missile_pt.y > 160)
+				continue;
+
+			// Else, actually render the missile.
+			buffer_missile(missile_pt.x, missile_pt.y);
+		}
+
 		//
 		// TODO draw the ship here
 		Point ship_pt = get_display_coordinates(&ship);
@@ -378,6 +431,28 @@ GameStatus game_test(uint8_t level)
 				break;
 			}
 			// if collision is true, then decrement health
+		}
+
+		// Check if any missiles collided with asteroids:
+		for (int i = 0; i < MISSILE_STACK_SIZE; i++) {
+			if (missile_arr[i].mass == 0) continue;
+
+			// Iterate through all asteroids
+			for (int j = 0; j < ASTEROID_STACK_SIZE; j++) {
+				if (asteroid_arr[j].mass == 0) continue;
+				if (check_collision(&missile_arr[i], &asteroid_arr[i], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
+							asteroid_arr[j].mass*2, asteroid_arr[j].mass*2)) {
+					// The collision occurred. We get rid of both 
+					// the asteroid and the missile.
+					asteroid_arr[j].mass = 0;
+					stack_push(&asteroid_stack, j);
+					missile_arr[i].mass = 0;
+					stack_push(&missile_stack, i);
+
+					// The missile can't collide with multiple things in one frame.
+					break;
+				}
+			}
 		}
 
 		// Check if the player collided with bonuses:
