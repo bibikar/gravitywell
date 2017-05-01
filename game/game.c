@@ -195,7 +195,7 @@ GameStatus game_test(uint8_t level)
 	ship_health = 3;
 	if (level == 1) {
 		score = 0; // only clear the score if new game
-		missiles = 0;
+		missiles = 3;
 		bombs = 0;
 	}
 	
@@ -440,7 +440,7 @@ GameStatus game_test(uint8_t level)
 			// Iterate through all asteroids
 			for (int j = 0; j < ASTEROID_STACK_SIZE; j++) {
 				if (asteroid_arr[j].mass == 0) continue;
-				if (check_collision(&missile_arr[i], &asteroid_arr[i], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
+				if (check_collision(&missile_arr[i], &asteroid_arr[j], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
 							asteroid_arr[j].mass*2, asteroid_arr[j].mass*2)) {
 					// The collision occurred. We get rid of both 
 					// the asteroid and the missile.
