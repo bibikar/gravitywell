@@ -167,18 +167,36 @@ const Note const victory[] = {
 	{75, 2}, {76, 2}, {78, 2}, {80, 2},
 	{81, 2}, {78, 2}, {75, 2}, {69, 2},
 };
+
+const Note const bonus_sound[] = {
+	{67,2},
+	{72,2}
+};
+
+const Note const collision_sound[] = {
+	{60,2},
+	{0,1},
+	{59,2},
+	{0,1},
+	{67,2}
+};
 	
 	
 const Song songs[] = {
 	{victory, 62, 4000000},
 	{test_song, 47, 5000000},
 	{yankee, 32, 10000000},
-	{harry_potter, 31, 10000000}
+	{harry_potter, 31, 10000000},
+	{bonus_sound, 2, 10000000},
+	{collision_sound, 5, 10000000}
 };
 
 Note *song_notes;
 uint32_t song_length;
-
+uint32_t song_flag =0;	//song_flag = 1 when a special song effect has to be played
+uint32_t temp_index;
+uint32_t temp_song_index, temp_song_length, temp_timer_delay;
+uint32_t song_index;
 
 //note_lookup has the systick reload values
 	
@@ -198,9 +216,21 @@ void set_index(uint8_t data)
 	Index = data;
 }
 	
-void Sound_Init(uint8_t song_index){
-// this will initialize the timer
+void Sound_Init(uint8_t index, uint8_t flag_s){
+	//check the flag to see if a sound effect has to be played
+	//if a sound effect has to be played then we have to save the state of the song that was playing
+	song_flag = flag_s;
+	if(flag_s == 1){
+		//in this case a sound effect has to be played. 
+		//save the state
+		temp_index = current_note_index;
+		temp_song_index = song_index;
+		temp_song_length = song_length;
+		temp_timer_delay = song_timer_delay;
+	}
+	// this will initialize the timer
 	// Update the song pointer and the length
+	song_index = index;
 	Song *next_song = (Song *) &songs[song_index];
 	song_notes = (Note *) next_song->note_arr;
 	song_length = (uint32_t) next_song->length;
@@ -218,6 +248,7 @@ void Sound_Init(uint8_t song_index){
 	Timer1_Init(10000);
 }
 
+
 void Sound_Play(uint32_t period){
 	if (period == 0) {
 		DAC_Out(31);
@@ -232,11 +263,19 @@ void timer0A_song(void){
 	if (--current_note_duration_left <= 0) {
 	  // Decrement this and check if the note is over already.
 	  // If so, we need to get the next note.
-		if(current_note_index==(song_length-1))
-			current_note_index=0;
-		else
+		if((current_note_index==(song_length-1))&&(song_flag==0))
+			current_note_index=0;	//if only the song is playing, not the sound effects
+		else if((current_note_index!=(song_length-1)))
 			current_note_index++;
-	 }
+		else if((current_note_index==(song_length-1))&&(song_flag==1))
+		{	//this means that the sound effect has been done, and we want to continue playing the previous song
+			//restore the state
+			current_note_index = temp_index;
+			song_index = temp_song_index;
+			song_length = temp_song_length;
+			song_timer_delay = temp_timer_delay;
+		}
+	}
   
   // Get the note to be played
   struct note current_note = song_notes[current_note_index];
@@ -248,7 +287,7 @@ void timer0A_song(void){
 		else Sound_Play(note_lookup[current_note.pitch]);
 		// since we have a new note, get Sound.c to play it
   }
-	
+
 }
 
 void timer1_play(){
