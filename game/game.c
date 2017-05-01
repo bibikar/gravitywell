@@ -19,7 +19,7 @@
 
 #define STARS_PER_FRAME 3
 #define ASTEROID_SPAWN_FRAMES 10
-#define BONUS_SPAWN_FRAMES 10
+#define BONUS_SPAWN_FRAMES 100
 
 #define SHIP_DISPLAY_X 55
 #define SHIP_DISPLAY_Y 120
@@ -69,8 +69,8 @@ typedef enum bonus_type {
 // There will be a maximum number of bonuses which can appear per level.
 // They will be stationary in the field, but not stationary to the player.
 typedef struct bonus_struct {
-	int16_t posX;
-	int16_t posY;
+	int32_t posX;
+	int32_t posY;
 	BonusType type;
 } Bonus;
 
@@ -297,7 +297,7 @@ GameStatus game_test(uint8_t level)
 			Entity e;
 			e.posX = bonus_arr[i].posX;
 			e.posY = bonus_arr[i].posY;
-			if (bonus_arr[i].type != BONUS_UNUSED && get_display_coordinates(&e).y > 170) {
+			if (get_display_coordinates(&e).y > 170) {
 				// Put its index back in the stack of bonuss we can use again
 				stack_push(&bonus_stack, i);
 				// Set the "unused bonus" flag 
@@ -366,7 +366,6 @@ GameStatus game_test(uint8_t level)
 			if (check_collision(&ship, &asteroid_arr[i], SHIP_WIDTH_PHYSICS, SHIP_HEIGHT_PHYSICS,
 				 asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
 
-				buffer_string(0, 0, "Collision", buffer_color(255, 0, 0));
 				// Since we know the collision has occurred,
 				// make sure we get rid of the asteroid
 				// so the same asteroid doesn't cause multiple collisions.
@@ -393,12 +392,10 @@ GameStatus game_test(uint8_t level)
 				BONUS_WIDTH_PHYSICS, BONUS_HEIGHT_PHYSICS)) {
 
 				// We collided with a bonus.
+				score += BONUS_SCORE_AMOUNT;
 				switch(bonus_arr[i].type) {
 				case BONUS_HEALTH:
 					ship_health++;
-					break;
-				case BONUS_SCORE:
-					score += BONUS_SCORE_AMOUNT;
 					break;
 				case BONUS_ATTACK:
 					if (missiles +3 < 256) missiles += 3;
@@ -420,7 +417,8 @@ GameStatus game_test(uint8_t level)
 
 		// Display number of missiles, top left corner
 		buffer_num(0, 0, missiles, buffer_color(255,255,0));
-		// TODO Display if we have a bomb, top right corner (icon)
+		// Display if we have a bomb, top right corner (icon)
+		if (bombs) buffer_char(122, 0, '\4', buffer_color(255,255,0));
 		// Display the health:
 		for (int i = 0; i < ship_health; i++) {
 			buffer_string(2+i*6, 150, "\3", buffer_color(255,0,0));
@@ -435,8 +433,8 @@ GameStatus game_test(uint8_t level)
 
 			// Display you died and score
 			buffer_string(0, 64, "      You died!", buffer_color(255, 0, 0));
-			buffer_string(0, 80, "        Score:", buffer_color(255, 0, 0));
-			buffer_num(0, 96, score, buffer_color(255, 0, 0));
+			buffer_string(0, 80, "    Score:", buffer_color(255, 0, 0));
+			buffer_num(72, 80, score, buffer_color(255, 0, 0));
 
 			// Cue to push button
 			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
@@ -502,9 +500,9 @@ GameStatus game_test(uint8_t level)
 				
 				// Assign bonus types by random:
 				uint16_t chooser = srandom() % 1000;
-				if (chooser < 300) bonus_arr[bonus_index].type = BONUS_HEALTH;
-				else if (chooser < 200) bonus_arr[bonus_index].type = BONUS_ATTACK;
-				else if (chooser < 50) bonus_arr[bonus_index].type = BONUS_ERASE;
+				if (chooser < 500) bonus_arr[bonus_index].type = BONUS_HEALTH;
+				if (chooser < 300) bonus_arr[bonus_index].type = BONUS_ATTACK;
+				if (chooser < 100) bonus_arr[bonus_index].type = BONUS_ERASE;
 			}
 		}
 	}

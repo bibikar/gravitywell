@@ -223,7 +223,12 @@ void buffer_bitmap(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const unsigned sh
 	}
 }
 	
+static void buffer_num_helper(int16_t *x, int16_t y, int32_t n, uint8_t color) {
+	if (n/10 != 0) buffer_num_helper(x, y, n/10, color);
+	buffer_char(*x, y, n%10+48, color);
+	(*x)+=6;
+}
+
 void buffer_num(int16_t x, int16_t y, int32_t n, uint8_t color){
-	if (n/10 != 0) buffer_num(x+6, y, n/10, color);
-	buffer_char(x, y, n%10+48, color);
+	buffer_num_helper(&x, y, n, color);
 }
