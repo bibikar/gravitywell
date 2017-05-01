@@ -15,11 +15,11 @@
 #define EVENT_QUEUE_SIZE 8
 #define STAR_STACK_SIZE 128
 #define ASTEROID_STACK_SIZE 64
-#define BONUS_STACK_SIZE 16
+#define BONUS_STACK_SIZE 64
 
 #define STARS_PER_FRAME 3
 #define ASTEROID_SPAWN_FRAMES 10
-#define BONUS_SPAWN_FRAMES 100
+#define BONUS_SPAWN_FRAMES 10
 
 #define SHIP_DISPLAY_X 55
 #define SHIP_DISPLAY_Y 120
@@ -98,10 +98,12 @@ static uint32_t asteroid_spawn_index = 0;
 static uint16_t bonus_stack_arr[BONUS_STACK_SIZE];
 Stack bonus_stack;
 static Bonus bonus_arr[BONUS_STACK_SIZE];
+static uint32_t bonus_spawn_index = 0;
 
 static Entity ship;
 static uint8_t ship_health;
 static uint32_t score;
+static uint8_t bombs, missiles;
 
 typedef struct point_struct {
 	int32_t x;
@@ -171,7 +173,11 @@ GameStatus game_test(uint8_t level)
 	ship.velX = 0;
 	ship.velY = -50; // the ship moves upwards
 	ship_health = 3;
-	if (level == 1) score = 0; // only clear the score if new game
+	if (level == 1) {
+		score = 0; // only clear the score if new game
+		missiles = 0;
+		bombs = 0;
+	}
 	
 	
 	// Initialize the random number generator.
@@ -219,8 +225,8 @@ GameStatus game_test(uint8_t level)
 			}
 		}
 
-		// TODO Poll the potentiometer(s)
-		int32_t thruster_force = adc_poll()/16; // TODO get this from potentiometer
+		// Poll the potentiometer(s)
+		int32_t thruster_force = adc_poll()/16;
 
 
 		// Calculate the force:
@@ -286,6 +292,20 @@ GameStatus game_test(uint8_t level)
 				asteroid_arr[i].mass = 0;
 			}
 		}
+		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
+			// If this bonus is to be drawn (BONUS_UNUSED) and is below the screen...
+			Entity e;
+			e.posX = bonus_arr[i].posX;
+			e.posY = bonus_arr[i].posY;
+			if (bonus_arr[i].type != BONUS_UNUSED && get_display_coordinates(&e).y > 170) {
+				// Put its index back in the stack of bonuss we can use again
+				stack_push(&bonus_stack, i);
+				// Set the "unused bonus" flag 
+				// If the mass is zero, then we'll skip drawing.
+				bonus_arr[i].type = BONUS_UNUSED;
+			}
+		}
+
 
 		// Draw new objects:
 		// Shooting stars are in the background:
@@ -293,6 +313,26 @@ GameStatus game_test(uint8_t level)
 			if (star_arr[i].vel == 0) continue;
 			buffer_star(star_arr[i].posX, star_arr[i].posY);
 		}
+
+		// Draw bonuses (between asteroids and shooting stars)
+		for (int i = 0; i < BONUS_STACK_SIZE; i++) {
+			if (bonus_arr[i].type == BONUS_UNUSED) continue;
+
+			// Get the display coordinates of the bonus:
+			Entity e;
+			e.posX = bonus_arr[i].posX;
+			e.posY = bonus_arr[i].posY;
+			Point bonus_pt = get_display_coordinates(&e);
+
+			// If these coordinates are off the screen, don't attempt to render anything.
+			if (bonus_pt.x < 0 || bonus_pt.x > 128 || bonus_pt.y < 0 || bonus_pt.y > 160)
+				continue;
+
+			// Else, actually render the bonus.
+			buffer_circle(bonus_pt.x, bonus_pt.y, BONUS_WIDTH_DISPLAY/2, buffer_color(0, 255, 0));
+		}
+
+		// Draw asteroids (in the foreground)
 		for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
 			// Our flag for "unused asteroid" is a mass of zero.
 			// If this element is unused, don't draw it.
@@ -361,10 +401,10 @@ GameStatus game_test(uint8_t level)
 					score += BONUS_SCORE_AMOUNT;
 					break;
 				case BONUS_ATTACK:
-					// TODO Grant the player one attack
+					if (missiles +3 < 256) missiles += 3;
 					break;
 				case BONUS_ERASE:
-					// TODO Grant the player one erase
+					if (bombs == 0) bombs = 1;
 					break;
 				default:
 					// do nothing
@@ -377,6 +417,10 @@ GameStatus game_test(uint8_t level)
 			}
 
 		}
+
+		// Display number of missiles, top left corner
+		buffer_num(0, 0, missiles, buffer_color(255,255,0));
+		// TODO Display if we have a bomb, top right corner (icon)
 		// Display the health:
 		for (int i = 0; i < ship_health; i++) {
 			buffer_string(2+i*6, 150, "\3", buffer_color(255,0,0));
@@ -432,7 +476,7 @@ GameStatus game_test(uint8_t level)
 				asteroid_arr[asteroid_index].velX = 0;
 				asteroid_arr[asteroid_index].velY = 0;
 				asteroid_arr[asteroid_index].mass = 4000;
-
+				
 				// Spawn one asteroid to the side of the player
 				asteroid_index = stack_pop(&asteroid_stack);
 				// Make it relative to the player, either to the left or right (positive or negative)
@@ -443,14 +487,13 @@ GameStatus game_test(uint8_t level)
 				asteroid_arr[asteroid_index].velX = 0;
 				asteroid_arr[asteroid_index].velY = 0;
 				asteroid_arr[asteroid_index].mass = 5000;
-				
 			}
 			// TODO fill these with random values which make sense
 		}
 
 		// Generate new bonuses
 		if (!stack_empty(&bonus_stack)) {
-			if (++asteroid_spawn_index % BONUS_SPAWN_FRAMES == 0) {
+			if (++bonus_spawn_index % BONUS_SPAWN_FRAMES == 0) {
 				// Spawn bonuses randomly. Some have better chances than others.
 				uint16_t bonus_index = stack_pop(&bonus_stack);
 				bonus_arr[bonus_index].posX = ship.posX + srandom() % 160000 - 80000;
