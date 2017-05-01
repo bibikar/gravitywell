@@ -25,6 +25,7 @@
 #define SHIP_DISPLAY_Y 120
 #define SHIP_WIDTH_PHYSICS 20000
 #define SHIP_HEIGHT_PHYSICS 20000
+#define SHIP_SPEED_LIMIT 200
 
 #define BONUS_WIDTH_PHYSICS 10000
 #define BONUS_HEIGHT_PHYSICS 10000
@@ -235,6 +236,10 @@ GameStatus game_test(uint8_t level)
 		// If we have a second potentiometer, we put that value where 
 		// it's 0 right now.
 		update_velocity(&ship, thruster_force, 0, dt);
+
+		// Evaluate speed limits:
+		if (ship.velX > SHIP_SPEED_LIMIT) ship.velX = SHIP_SPEED_LIMIT;
+		else if (ship.velX < -1*SHIP_SPEED_LIMIT) ship.velX = -1*SHIP_SPEED_LIMIT;
 
 		// Erase old objects:
 		// Completely clearing the buffer is the easiest way to do this.
