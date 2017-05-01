@@ -137,6 +137,20 @@ void buffer_star(int16_t x, int16_t y) {
 	}
 }
 
+
+// Draw a missile at (x, y).
+// To erase, just draw a rectangle over the old position.
+void buffer_missile(int16_t x, int16_t y) {
+	if (x > ST7735_TFTWIDTH || x < 0) return;
+	if (y + 10 > ST7735_TFTHEIGHT || y < 0) return;
+	uint8_t grey_value = 16;
+	for (int i = 0; i < 10; i++) {
+		buffer[x][y+i] = buffer_color(255-grey_value, 0, 0);
+		grey_value += 16;
+	}
+}
+
+
 // Draw a character into the buffer.
 // Adapted from ST7735.c
 void buffer_char(int16_t x, int16_t y, char c, uint8_t color) {
