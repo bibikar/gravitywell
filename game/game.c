@@ -146,7 +146,7 @@ uint8_t check_collision(Entity *e1, Entity *e2, uint16_t w1, uint16_t h1, uint16
 
 
 GameStatus game_test(uint8_t level)
-{	
+{	Sound_Init(SONG_VICTORY, 0);
 	ADC_Init();
 	// Initialize the event queue.
 	queue_init(&event_queue, event_arr, EVENT_QUEUE_SIZE);

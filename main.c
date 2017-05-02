@@ -77,7 +77,7 @@ int main(void){
 	portf_init();
 	DAC_Init();
 	
-	Sound_Init(SONG_VICTORY,0);
+	Sound_Init(SONG_TEST_SONG,0);
 	GameStatus status;
 	status.status = MENU_MAIN;
 	while (1) {
@@ -87,6 +87,7 @@ int main(void){
 		else if (status.status >= 128) {
 			status = game_test(status.status - 128);
 		}
+		Sound_Init(SONG_TEST_SONG,0);
 		status.status = show_menu(status);	//second number is the score		
 	}
 
