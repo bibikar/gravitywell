@@ -225,7 +225,7 @@ GameStatus game_test(uint8_t level)
 			uint32_t event = queue_poll(&event_queue);
 			if (event == 0 && missiles) {
 				// Fire a missile
-
+				Sound_Init(SONG_MISSILE_SOUND, 1);
 				missiles--;
 				Entity missile;
 				missile.posX = ship.posX;
@@ -443,7 +443,6 @@ GameStatus game_test(uint8_t level)
 				if (asteroid_arr[j].mass == 0) continue;
 				if (check_collision(&missile_arr[i], &asteroid_arr[j], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
 							asteroid_arr[j].mass*2, asteroid_arr[j].mass*2)) {
-					Sound_Init(SONG_MISSILE_SOUND,1);
 					// The collision occurred. We get rid of both 
 					// the asteroid and the missile.
 					asteroid_arr[j].mass = 0;
