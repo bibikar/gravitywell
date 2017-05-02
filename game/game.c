@@ -418,13 +418,13 @@ GameStatus game_test(uint8_t level)
 		}
 
 		//
-		// TODO draw the ship here
+		// draw the ship here
 		Point ship_pt = get_display_coordinates(&ship);
 		//buffer_circle(ship_pt.x, ship_pt.y, 10, buffer_color(255, 0, 0));
 		buffer_bitmap(ship_pt.x, ship_pt.y, 18, 8, (const uint8_t*) PlayerShip0);
 
 
-		// TODO Check if the level is over. If so, return!
+		// Check if the level is over. If so, return!
 		if (ship.posY + LEVEL_DISTANCE*level*level < 0) {
 			buffer_string(30, 48, "FIELD CLEAR", buffer_color(0, 255, 0));
 			buffer_rect_outline(30 - 4, 48 - 4, 72, 14, buffer_color(0,255,0));
@@ -481,6 +481,7 @@ GameStatus game_test(uint8_t level)
 				if (asteroid_arr[j].mass == 0) continue;
 				if (check_collision(&missile_arr[i], &asteroid_arr[j], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
 							asteroid_arr[j].mass*2, asteroid_arr[j].mass*2)) {
+					Sound_Init(SONG_MISSILE_ASTEROID, 1);
 					// The collision occurred. We get rid of both 
 					// the asteroid and the missile.
 					asteroid_arr[j].mass = 0;

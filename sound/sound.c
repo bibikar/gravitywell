@@ -189,6 +189,9 @@ const Note const bomb_sound[] = {
 	{50,4}
 };
 
+const Note const missile_asteroid[] = {
+	{59, 2}
+};
 const Song songs[] = {
 	{victory, 62, 4000000},	
 	{test_song, 47, 5000000},	
@@ -197,7 +200,8 @@ const Song songs[] = {
 	{bonus_sound, 2, 10000000},
 	{collision_sound, 4, 10000000},
 	{missile_sound,1, 10000000},
-	{bomb_sound, 1, 10000000}	
+	{bomb_sound, 1, 10000000},
+	{missile_asteroid, 1, 10000000}	
 };
 
 Note *song_notes;
