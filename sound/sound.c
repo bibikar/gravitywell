@@ -283,6 +283,7 @@ void timer0A_song(void){
 			song_index = temp_song_index;
 			song_length = temp_song_length;
 			song_timer_delay = temp_timer_delay;
+			Timer0_Init(song_timer_delay);
 			song_flag = 0;	//reset the song_flag to 0 since we are no longer playing a sound effect
 			Song *next_song = (Song *) &songs[song_index];
 			song_notes = (Note *) next_song->note_arr;
