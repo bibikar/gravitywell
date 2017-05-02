@@ -219,8 +219,8 @@ void set_index(uint8_t data)
 void Sound_Init(uint8_t index, uint8_t flag_s){
 	//check the flag to see if a sound effect has to be played
 	//if a sound effect has to be played then we have to save the state of the song that was playing
-	song_flag = flag_s;
-	if(flag_s == 1){
+	if(flag_s == 1 && song_flag != 1){
+		song_flag = flag_s;
 		//in this case a sound effect has to be played. 
 		//save the state
 		temp_index = current_note_index;
@@ -275,6 +275,8 @@ void timer0A_song(void){
 			song_length = temp_song_length;
 			song_timer_delay = temp_timer_delay;
 			song_flag = 0;	//reset the song_flag to 0 since we are no longer playing a sound effect
+			Song *next_song = (Song *) &songs[song_index];
+			song_notes = (Note *) next_song->note_arr;
 		}
 	}
   
