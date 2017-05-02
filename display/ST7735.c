@@ -1075,12 +1075,12 @@ void ST7735_DrawChar(int16_t x, int16_t y, char c, int16_t textColor, int16_t bg
           for(j=0; j<size; j=j+1){
             pushColor(textColor);
           }
-        } else{
+        } /*else{
           // bit is cleared in Font, print pixel(s) in background color
           for(j=0; j<size; j=j+1){
             pushColor(bgColor);
           }
-        }
+        }*/
       }
       // print blank column(s) to the right of character
       for(j=0; j<size; j=j+1){
@@ -1496,14 +1496,31 @@ void ST7735_OutChar(char ch){
     if(StY>15){
       StY = 0;
     }
-    ST7735_DrawString(0,StY,"                     ",StTextColor);
+    //ST7735_DrawString(0,StY,"                     ",StTextColor);
     return;
   }
-  ST7735_DrawCharS(StX*6,StY*10,ch,ST7735_YELLOW,ST7735_BLACK, 1);
+  ST7735_DrawCharS(StX*6,StY*10,ch,ST7735_YELLOW,ST7735_YELLOW, 1);
   StX++;
   if(StX>20){
     StX = 20;
-    ST7735_DrawCharS(StX*6,StY*10,'*',ST7735_RED,ST7735_BLACK, 1);
+    //ST7735_DrawCharS(StX*6,StY*10,'*',ST7735_RED,ST7735_BLACK, 1);
+  }
+  return;
+}
+void ST7735_OutCharErase(char ch){
+  if((ch == 10) || (ch == 13) || (ch == 27)){
+    StY++; StX=0;
+    if(StY>15){
+      StY = 0;
+    }
+    //ST7735_DrawString(0,StY,"                     ",StTextColor);
+    return;
+  }
+  ST7735_DrawCharS(StX*6,StY*10,ch,ST7735_BLACK,ST7735_BLACK, 1);
+  StX++;
+  if(StX>20){
+    StX = 20;
+    //ST7735_DrawCharS(StX*6,StY*10,'*',ST7735_RED,ST7735_BLACK, 1);
   }
   return;
 }
