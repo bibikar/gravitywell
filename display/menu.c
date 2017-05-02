@@ -11,20 +11,35 @@
 #define LEFT_BUTTON 0x01
 #define RIGHT_BUTTON 0x02
 
-#define HELP_COLOR_MULTIPLIER_R 4
-#define HELP_COLOR_MULTIPLIER_G 8
-#define HELP_COLOR_MULTIPLIER_B 12
+#define HELP_COLOR_MULTIPLIER_R 24
+#define HELP_COLOR_MULTIPLIER_G 12
+#define HELP_COLOR_MULTIPLIER_B 20
 
 
 #define MAIN_MENU_SELECTION_ROW_COUNT 3
 static const uint8_t main_menu_selection_rows[3] = {8,9,10};
 
 // Help screens
-#define HELP_SCREEN_COUNT 3
-static char help_strings[][100] = {
-	"This is page 1\nof the help file\nthe aim is to\nnavigate through the\nfield and avoid\nthe asteriods",
-	"This is page 2\nof the help file",
-	"This is the last\nhelp page, I think."
+#define HELP_SCREEN_COUNT 6
+static char help_strings[][200] = {
+	// Page 1:
+	"Welcome, Captain,\nto the USS Newton!\n\nYou are on a research\nmission in Saturn's\nrings. It is your\n"
+	"job to collect the\ngreen crystals while\navoiding the field\nof dangerous\nasteroids.",
+	// Page 2:
+	"Navigation:\n\nUse the slide pot\nto control your ship\nthrusters. While in\ncenter, the ship's\n"
+	"velocity is constant.\nMoving it to either\nside will cause the\nship to accelerate\nleft or right.",
+	// Page 3:
+	"Due to the ship's\ndesign, you cannot\ncontrol the forward\nmotion of the ship.\nThus, you will have\n"
+	"to plan ahead as\nthe ship cannot\nslow down in the\nforward direction!",
+	// Page 4:
+	"Crystals:\n\nThroughout the field,\nyou will see green\nspheres. These are\ncrystals. We don't\n"
+	"know what all of\nthem do, but some\nwill help you on\nyour mission.",
+	// Page 5:
+	"Missiles:\n\nYour ship can carry\n255 missiles. You\nstart off with 3, but\nsome crystals will\ngrant you"
+	" more.\nMissiles are shown in\nthe top left corner\nof the screen. The\nleft button fires\none or two.",
+	// Page 6:
+	"Bombs:\n\nYour ship can carry\none bomb. You can\nonly obtain one from\ncrystals. It appears\nas a diamond in the\n"
+	"top right corner of\nthe screen. Use it to\nerase all visible\nasteroids with the\nright button."
 };
 
 // Get the status of the buttons
@@ -45,7 +60,7 @@ uint8_t show_main_menu_selector(const uint8_t rows[], const uint8_t row_count) {
 		//ST7735_OutChar('*');
 		if (menu_get_button_status() == LEFT_BUTTON) { // if the scroll button is pressed
 			ST7735_SetCursor(0, rows[current_row]);
-			ST7735_OutChar(' ');
+			ST7735_OutCharErase('*');
 			//ST7735_SetCursor(20, rows[current_row]);
 			//ST7735_OutChar(' ');
 			if ((current_row+1) < row_count) current_row++;
@@ -119,13 +134,12 @@ uint8_t show_menu(GameStatus status) {
 				this_help = help_strings[help_screen_index];
 				ST7735_OutString(this_help);
 				ST7735_SetCursor(15,14);
-				if(help_screen_index!=2)
-					ST7735_OutString("Next");
-				else
-					ST7735_OutString("Exit");
-				if(help_screen_index!=0)
-				{ST7735_SetCursor(2,14);
-				ST7735_OutString("Prev");}
+				if(help_screen_index < HELP_SCREEN_COUNT - 1) ST7735_OutString("Next");
+				else ST7735_OutString("Exit");
+				if (help_screen_index != 0) {
+					ST7735_SetCursor(2,14);
+					ST7735_OutString("Prev");
+				}
 				// Make sure the button is released before continuing
 				while (menu_get_button_status() == 0) {}
 				// Make sure some button is pressed before continuing.

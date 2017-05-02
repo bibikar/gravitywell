@@ -388,6 +388,7 @@ void ST7735_PlotNextErase(void);
 // Inputs: 8-bit ASCII character
 // Outputs: none
 void ST7735_OutChar(char ch);
+void ST7735_OutCharErase(char ch);
 
 //********ST7735_OutString*****************
 // Print a string of characters to the ST7735 LCD.
