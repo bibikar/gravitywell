@@ -77,13 +77,14 @@ int main(void){
 	portf_init();
 	DAC_Init();
 	
-	Sound_Init(SONG_VICTORY,0);
+	Sound_Init(SONG_TEST_SONG,0);
 	GameStatus status;
 	status.status = MENU_MAIN;
 	while (1) {
 		if (status.status == MENU_NEW_GAME) {
 			status = game_test(1);
 		}
+		Sound_Init(SONG_TEST_SONG,0);
 		status.status = show_menu(status);	//second number is the score		
 	}
 
