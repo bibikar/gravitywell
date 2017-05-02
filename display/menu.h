@@ -7,6 +7,7 @@
 #define MENU_MAIN 0
 #define MENU_NEW_GAME 1
 #define MENU_HELP 2
+#define MENU_INFO 3
 #define MENU_GAME_OVER 64
 #define MENU_NEXT_LEVEL 65
 #define MENU_YOU_WIN 66

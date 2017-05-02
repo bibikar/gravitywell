@@ -99,7 +99,7 @@ uint8_t show_menu(GameStatus status) {
 			ST7735_SetCursor(8, 9);
 			ST7735_OutString("Help");
 			ST7735_SetCursor(8, 10);
-			ST7735_OutString("Exit");
+			ST7735_OutString("Info");
 			ST7735_SetCursor(13,14);
 			ST7735_OutString("Select");
 			ST7735_SetCursor(2,14);
@@ -157,6 +157,21 @@ uint8_t show_menu(GameStatus status) {
 			}while (help_screen_index < HELP_SCREEN_COUNT);
 			while (menu_get_button_status() != 0) {}
 			return MENU_MAIN;
+		case MENU_INFO:
+			while (menu_get_button_status() != 0) {}
+			ST7735_FillScreen(ST7735_Color565(0, 32, 0));
+			ST7735_SetCursor(0,0);
+			ST7735_OutString("GRAVITY WELL\n");
+			ST7735_OutString("EE 319K, Spring 2017\n\n");
+			ST7735_OutString("Authors:\n");
+			ST7735_OutString("Sameer Bibikar,\n");
+			ST7735_OutString("Sneha Pendharkar.\n\n");
+			ST7735_OutString("bibikar.github.io");
+			while (menu_get_button_status() == 0) {}
+			while (menu_get_button_status() != 0) {}
+			break;
+
+
 		case MENU_GAME_OVER:
 		case MENU_YOU_WIN:
 			// Data should have the score!!
