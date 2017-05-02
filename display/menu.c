@@ -110,7 +110,7 @@ uint8_t show_menu(GameStatus status) {
 			switch(main_menu_selection) {
 				case 0: return MENU_NEW_GAME;
 				case 1: return MENU_HELP;
-				case 2: return MENU_EXIT;
+				case 2: return MENU_INFO;
 				default: return MENU_ERROR;
 			}
 		case MENU_HELP:

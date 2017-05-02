@@ -238,6 +238,7 @@ GameStatus game_test(uint8_t level)
 				missile_arr[missile_index] = missile;
 			}
 			else if (event == 4 && bombs) {
+				Sound_Init(SONG_BOMB_SOUND, 1);
 				// Erase all asteroids.
 				bombs = 0; // get rid of bombs
 				for (int i = 0; i < ASTEROID_STACK_SIZE; i++) {
@@ -442,7 +443,7 @@ GameStatus game_test(uint8_t level)
 				if (asteroid_arr[j].mass == 0) continue;
 				if (check_collision(&missile_arr[i], &asteroid_arr[j], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
 							asteroid_arr[j].mass*2, asteroid_arr[j].mass*2)) {
-					Sound_Init(SONG_COLLISION_SOUND,1);
+					Sound_Init(SONG_MISSILE_SOUND,1);
 					// The collision occurred. We get rid of both 
 					// the asteroid and the missile.
 					asteroid_arr[j].mass = 0;

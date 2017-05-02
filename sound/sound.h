@@ -20,6 +20,7 @@ typedef enum song_type {
 	SONG_BONUS_SOUND,
 	SONG_COLLISION_SOUND,
 	SONG_MISSILE_SOUND, 
+	SONG_BOMB_SOUND,
 	NUM_SONGS
 } SongType;
 
