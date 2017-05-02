@@ -170,23 +170,23 @@ const Note const victory[] = {
 
 const Note const bonus_sound[] = {
 	{67,2},
-	{72,2}
+	{72,4},
+	{0,1}
 };
 
 const Note const collision_sound[] = {
 	{60,2},
 	{0,1},
-	{59,2},
-	{0,1},
-	{67,2}
+	{56,2},
+	{0,1}
 };
 
 const Note const missile_sound[] = {
-	{80,2}	
+	{60,2},
 };
 
 const Note const bomb_sound[] = {
-	{50,2}
+	{50,4}
 };
 
 const Song songs[] = {
@@ -195,7 +195,7 @@ const Song songs[] = {
 	{yankee, 32, 10000000},
 	{harry_potter, 31, 10000000},
 	{bonus_sound, 2, 10000000},
-	{collision_sound, 5, 10000000},
+	{collision_sound, 4, 10000000},
 	{missile_sound,1, 10000000},
 	{bomb_sound, 1, 10000000}	
 };
@@ -254,7 +254,7 @@ void Sound_Init(SongType index, uint8_t flag_s){
 	
 	// Initialize the timers with appropriate delays
 	Timer0_Init(song_timer_delay);
-	Timer1_Init(10000);
+	Timer1_Init(note_lookup[song_notes[0].pitch]);
 }
 
 
