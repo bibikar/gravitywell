@@ -25,8 +25,8 @@
 
 #define SHIP_DISPLAY_X 55
 #define SHIP_DISPLAY_Y 120
-#define SHIP_WIDTH_PHYSICS 20000
-#define SHIP_HEIGHT_PHYSICS 20000
+#define SHIP_WIDTH_PHYSICS 18000
+#define SHIP_HEIGHT_PHYSICS 8000
 #define SHIP_SPEED_LIMIT 200
 
 #define BONUS_WIDTH_PHYSICS 10000
@@ -425,11 +425,11 @@ GameStatus game_test(uint8_t level)
 
 
 		// TODO Check if the level is over. If so, return!
-		if (ship.posY + LEVEL_DISTANCE*level < 0) {
+		if (ship.posY + LEVEL_DISTANCE*level*level < 0) {
 			buffer_string(30, 48, "FIELD CLEAR", buffer_color(0, 255, 0));
 			buffer_rect_outline(30 - 4, 48 - 4, 72, 14, buffer_color(0,255,0));
 
-			buffer_string(0, 80, "    Score:", buffer_color(0, 255, 0));
+			buffer_string(0, 80, "      Score:", buffer_color(0, 255, 0));
 			buffer_num(72, 80, score, buffer_color(0, 255, 0));
 
 			// Cue to push button
@@ -529,8 +529,10 @@ GameStatus game_test(uint8_t level)
 
 		}
 
+		// Display distance left, top left corner
+		buffer_num(0, 0, LEVEL_DISTANCE*level*level + ship.posY, buffer_color(255, 255, 0));
 		// Display number of missiles, top left corner
-		buffer_num(0, 0, missiles, buffer_color(255,255,0));
+		buffer_num(0, 10, missiles, buffer_color(255,255,0));
 		// Display if we have a bomb, top right corner (icon)
 		if (bombs) buffer_char(122, 0, '\4', buffer_color(255,255,0));
 		// Display the health:
@@ -547,7 +549,7 @@ GameStatus game_test(uint8_t level)
 
 			// Display you died and score
 			buffer_string(0, 64, "      You died!", buffer_color(255, 0, 0));
-			buffer_string(0, 80, "    Score:", buffer_color(255, 0, 0));
+			buffer_string(0, 80, "      Score:", buffer_color(255, 0, 0));
 			buffer_num(72, 80, score, buffer_color(255, 0, 0));
 
 			// Cue to push button
@@ -580,7 +582,7 @@ GameStatus game_test(uint8_t level)
 
 		if (!stack_empty(&asteroid_stack)) {
 			// TODO add a condition here: only spawn new asteroids when we want to
-			if (++asteroid_spawn_index % (ASTEROID_SPAWN_FRAMES) == 0) {
+			if (++asteroid_spawn_index % (ASTEROID_SPAWN_FRAMES-level) == 0) {
 				// Spawn one asteroid above the player
 				uint16_t asteroid_index = stack_pop(&asteroid_stack);
 				asteroid_arr[asteroid_index].posX = ship.posX + srandom() % 160000 - 80000;
