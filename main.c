@@ -84,7 +84,7 @@ int main(void){
 		if (status.status == MENU_NEW_GAME) {
 			status = game_test(1);
 		}
-		else if (status.status >= 128) {
+		while (status.status >= 128) {
 			status = game_test(status.status - 128);
 		}
 		Sound_Init(SONG_TEST_SONG,0);

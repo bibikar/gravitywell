@@ -413,11 +413,11 @@ GameStatus game_test(uint8_t level)
 
 		// TODO Check if the level is over. If so, return!
 		if (ship.posY + LEVEL_DISTANCE*level < 0) {
-			buffer_string(30, 48, "FIELD CLEAR", buffer_color(255, 0, 0));
-			buffer_rect_outline(30 - 4, 48 - 4, 72, 14, buffer_color(255,0,0));
+			buffer_string(30, 48, "FIELD CLEAR", buffer_color(0, 255, 0));
+			buffer_rect_outline(30 - 4, 48 - 4, 72, 14, buffer_color(0,255,0));
 
-			buffer_string(0, 80, "    Score:", buffer_color(255, 0, 0));
-			buffer_num(72, 80, score, buffer_color(255, 0, 0));
+			buffer_string(0, 80, "    Score:", buffer_color(0, 255, 0));
+			buffer_num(72, 80, score, buffer_color(0, 255, 0));
 
 			// Cue to push button
 			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
