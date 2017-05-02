@@ -7,7 +7,7 @@
 // We have done some #defines in the menu.h file.
 #include "menu.h"
 #include "../game/game.h"
-
+#include "../sound/sound.h"
 #define LEFT_BUTTON 0x01
 #define RIGHT_BUTTON 0x02
 
@@ -87,6 +87,7 @@ uint8_t show_menu(GameStatus status) {
 	char *this_help = 0;
 	switch(id) {
 		case MENU_MAIN:
+			Sound_Init(SONG_TEST_SONG,0);
 			while (menu_get_button_status() != 0) {}
 			ST7735_FillScreen(0);
 			ST7735_SetCursor(4, 3);
@@ -114,12 +115,13 @@ uint8_t show_menu(GameStatus status) {
 				default: return MENU_ERROR;
 			}
 		case MENU_HELP:
-			
+			Sound_Init(SONG_HARRY_POTTER, 0);
 			do {
 				while (menu_get_button_status() != 0) {}
 				// Fill the screen with a blank color, but let's make it somewhat more interesting than just a color like that
 				ST7735_FillScreen(ST7735_Color565(help_screen_index*HELP_COLOR_MULTIPLIER_R, help_screen_index*HELP_COLOR_MULTIPLIER_G, help_screen_index*HELP_COLOR_MULTIPLIER_B));
 				// Tell the user we're in the help menu
+				
 				ST7735_SetCursor(0,0);
 				ST7735_OutString("Help (");
 				LCD_OutDec(help_screen_index+1);

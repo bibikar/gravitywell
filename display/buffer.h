@@ -18,3 +18,5 @@ void buffer_char(int16_t, int16_t, char, uint8_t);
 void buffer_string(int16_t, int16_t, char*, uint8_t);
 void buffer_write();
 void buffer_num(int16_t, int16_t, int32_t, uint8_t);
+void buffer_bitmap(uint8_t, uint8_t, uint8_t, uint8_t, const uint8_t*);
+	
