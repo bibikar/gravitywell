@@ -418,7 +418,7 @@ GameStatus game_test(uint8_t level)
 			// check the collision
 			if (check_collision(&ship, &asteroid_arr[i], SHIP_WIDTH_PHYSICS, SHIP_HEIGHT_PHYSICS,
 				 asteroid_arr[i].mass*2, asteroid_arr[i].mass*2)) {
-				Sound_Init(5,1);
+				Sound_Init(SONG_COLLISION_SOUND,1);
 				// Since we know the collision has occurred,
 				// make sure we get rid of the asteroid
 				// so the same asteroid doesn't cause multiple collisions.
@@ -442,7 +442,7 @@ GameStatus game_test(uint8_t level)
 				if (asteroid_arr[j].mass == 0) continue;
 				if (check_collision(&missile_arr[i], &asteroid_arr[j], MISSILE_WIDTH_PHYSICS, MISSILE_HEIGHT_PHYSICS,
 							asteroid_arr[j].mass*2, asteroid_arr[j].mass*2)) {
-					Sound_Init(5,1);
+					Sound_Init(SONG_COLLISION_SOUND,1);
 					// The collision occurred. We get rid of both 
 					// the asteroid and the missile.
 					asteroid_arr[j].mass = 0;
@@ -466,7 +466,7 @@ GameStatus game_test(uint8_t level)
 
 			if (check_collision(&ship, &bonus_e, SHIP_WIDTH_PHYSICS, SHIP_HEIGHT_PHYSICS,
 				BONUS_WIDTH_PHYSICS, BONUS_HEIGHT_PHYSICS)) {
-				Sound_Init(4,1);
+				Sound_Init(SONG_BONUS_SOUND,1);
 				// We collided with a bonus.
 				score += BONUS_SCORE_AMOUNT;
 				switch(bonus_arr[i].type) {

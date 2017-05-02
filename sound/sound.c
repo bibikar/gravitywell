@@ -180,15 +180,25 @@ const Note const collision_sound[] = {
 	{0,1},
 	{67,2}
 };
+
+const Note const missile_sound[] = {
 	
 	
+};
+
+const Note const bomb_sound[] = {
+	
+};
+
 const Song songs[] = {
-	{victory, 62, 4000000},
-	{test_song, 47, 5000000},
+	{victory, 62, 4000000},	
+	{test_song, 47, 5000000},	
 	{yankee, 32, 10000000},
 	{harry_potter, 31, 10000000},
 	{bonus_sound, 2, 10000000},
-	{collision_sound, 5, 10000000}
+	{collision_sound, 5, 10000000},
+	{missile_sound,5, 10000000},
+	
 };
 
 Note *song_notes;
@@ -216,7 +226,7 @@ void set_index(uint8_t data)
 	Index = data;
 }
 	
-void Sound_Init(uint8_t index, uint8_t flag_s){
+void Sound_Init(SongType index, uint8_t flag_s){
 	//check the flag to see if a sound effect has to be played
 	//if a sound effect has to be played then we have to save the state of the song that was playing
 	if(flag_s == 1 && song_flag != 1){

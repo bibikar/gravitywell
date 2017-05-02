@@ -77,7 +77,7 @@ int main(void){
 	portf_init();
 	DAC_Init();
 	
-	Sound_Init(3,0);
+	Sound_Init(SONG_VICTORY,0);
 	GameStatus status;
 	status.status = MENU_MAIN;
 	while (1) {
