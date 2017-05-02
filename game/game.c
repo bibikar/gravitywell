@@ -40,6 +40,7 @@
 
 #define PAUSE_MESSAGE_X 34
 #define PAUSE_MESSAGE_Y 80
+#define LEVEL_DISTANCE 1000000
 
 void DisableInterrupts(void);
 void EnableInterrupts(void);
@@ -191,7 +192,7 @@ GameStatus game_test(uint8_t level)
 	ship.posX = 0;
 	ship.posY = 0; // starting position
 	ship.velX = 0;
-	ship.velY = -50; // the ship moves upwards
+	ship.velY = -50*level; // the ship moves upwards
 	ship_health = 3;
 	if (level == 1) {
 		score = 0; // only clear the score if new game
@@ -411,6 +412,30 @@ GameStatus game_test(uint8_t level)
 
 
 		// TODO Check if the level is over. If so, return!
+		if (ship.posY + LEVEL_DISTANCE*level < 0) {
+			buffer_string(30, 48, "FIELD CLEAR", buffer_color(255, 0, 0));
+			buffer_rect_outline(30 - 4, 48 - 4, 72, 14, buffer_color(255,0,0));
+
+			buffer_string(0, 80, "    Score:", buffer_color(255, 0, 0));
+			buffer_num(72, 80, score, buffer_color(255, 0, 0));
+
+			// Cue to push button
+			buffer_string(0, 128, " Press any button to", buffer_color(255, 255, 0));
+			buffer_string(0, 144, "      continue", buffer_color(255, 255, 0));
+			
+			// Write new buffer
+			buffer_write();
+
+			// Wait for event queue to get something, then
+			// disable the GPIO interrupts. 
+			// We then finally return the GameStatus saying
+			// to go back to the main menu.
+			while (queue_empty(&event_queue)) {}
+			portf_disable_interrupts();
+			GameStatus ret = {128 + level + 1, score};
+			return ret;
+		}
+
 		// Check collisions:
 		
 		// Check if the player collided with asteroids:

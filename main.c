@@ -84,6 +84,9 @@ int main(void){
 		if (status.status == MENU_NEW_GAME) {
 			status = game_test(1);
 		}
+		else if (status.status >= 128) {
+			status = game_test(status.status - 128);
+		}
 		status.status = show_menu(status);	//second number is the score		
 	}
 
