@@ -21,7 +21,7 @@ static const uint8_t main_menu_selection_rows[3] = {8,9,10};
 
 // Help screens
 #define HELP_SCREEN_COUNT 6
-static const char *const help_strings[] = {
+static char help_strings[][240] = {
 	// Page 1:
 	"Welcome, Captain,\nto the USS Newton!\n\nYou are on a research\nmission in Saturn's\nrings. It is your\n"
 	"job to collect the\ngreen crystals while\navoiding the field\nof dangerous\nasteroids.",
@@ -39,7 +39,9 @@ static const char *const help_strings[] = {
 	" more.\nMissiles are shown in\nthe top left corner\nof the screen. The\nleft button fires\none or two.",
 	// Page 6:
 	"Bombs:\n\nYour ship can carry\none bomb. You can\nonly obtain one from\ncrystals. It appears\nas a diamond in the\n"
-	"top right corner of\nthe screen. Use it to\nerase all visible\nasteroids with the\nright button."
+	"top right corner of\nthe screen. Use it to\nerase all visible\nasteroids with the\nright button.",
+	//Page 7 
+	"This is a test\nlast page. If this\nis garbled, great!"
 };
 
 // Get the status of the buttons
