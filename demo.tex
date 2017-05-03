@@ -1,0 +1,60 @@
+\documentclass[12pt]{article}
+\usepackage{listings,geometry}
+\geometry{letterpaper,margin=0.3in}
+
+\begin{document}
+\large{\underline{Gravity Well} - EE 319K lab 10 (Sameer Bibikar, Sneha Pendharkar)}
+\lstset{basicstyle=\normalsize\ttfamily,language=C,breaklines=true,columns=fullflexible,keepspaces=true}
+\begin{lstlisting}
+// [input/portf.c] ISR for edge triggered interrupts, using queue
+void GPIOPortF_Handler() {
+	if (systick_getms() - ms1 < 10) {
+		GPIO_PORTF_ICR_R = 0x11;
+		return; // If the button was pushed twice in 10 ms, ignore it.
+	}
+	Queue *event_queue = get_event_queue();
+	if (GPIO_PORTF_RIS_R & 0x01) {
+		queue_offer(event_queue, 0);
+		GPIO_PORTF_ICR_R = 0x01; // acknowledge flag on PF0
+	}
+	if (GPIO_PORTF_RIS_R & 0x10) {
+		queue_offer(event_queue, 4);
+		GPIO_PORTF_ICR_R = 0x10; // acknowledge flag on PF4
+	}
+	ms1 = systick_getms();
+}
+// [game/game.c] Generate new bonuses
+if (!stack_empty(&bonus_stack)) {
+	if (++bonus_spawn_index % BONUS_SPAWN_FRAMES == 0) {
+		// Spawn bonuses randomly. Some have better chances than others.
+		uint16_t i = stack_pop(&bonus_stack); // Get unused memory space
+		bonus_arr[i].posX = ship.posX + srandom() % 160000 - 80000;
+		bonus_arr[i].posY = ship.posY - SHIP_DISPLAY_Y*1000 - srandom() % 10000;
+		bonus_arr[i].type = BONUS_SCORE; // by default, spawn score objects
+		// Assign bonus types by random:
+		uint16_t chooser = srandom() % 1000;
+		if (chooser < 500) bonus_arr[i].type = BONUS_HEALTH;
+		if (chooser < 300) bonus_arr[i].type = BONUS_ATTACK;
+		if (chooser < 100) bonus_arr[i].type = BONUS_ERASE;
+	}
+}
+// [display/buffer.c] Efficiently write the buffer to the display
+void buffer_write() {
+	ST7735_SetWindow(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+	for (uint8_t i = 0; i < DISPLAY_HEIGHT; i++) {
+		for (uint8_t j = 0; j < DISPLAY_WIDTH; j++) {
+			ST7735_PushColor(buffer_displaycolor(buffer[j][i]));
+		}
+	}
+}
+// [display/buffer.c] Use recursion to draw a number onto the display
+static void buffer_num_helper(int16_t *x, int16_t y, int32_t n, uint8_t color) {
+	if (n/10 != 0) buffer_num_helper(x, y, n/10, color);
+	buffer_char(*x, y, n%10+48, color);
+	(*x)+=6;
+}
+void buffer_num(int16_t x, int16_t y, int32_t n, uint8_t color) {
+	buffer_num_helper(&x, y, n, color);
+}
+\end{lstlisting}
+\end{document}

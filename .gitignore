@@ -4,3 +4,7 @@ a.out
 *.o
 *.crf
 *.d
+*.out
+*.aux
+*.log
+*.pdf
