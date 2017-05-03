@@ -21,7 +21,7 @@ static const uint8_t main_menu_selection_rows[3] = {8,9,10};
 
 // Help screens
 #define HELP_SCREEN_COUNT 6
-static char help_strings[][200] = {
+static const char *const help_strings[] = {
 	// Page 1:
 	"Welcome, Captain,\nto the USS Newton!\n\nYou are on a research\nmission in Saturn's\nrings. It is your\n"
 	"job to collect the\ngreen crystals while\navoiding the field\nof dangerous\nasteroids.",
@@ -84,7 +84,7 @@ uint8_t show_menu(GameStatus status) {
 	uint8_t id = status.status;
 	uint32_t data = status.data;
 	uint8_t help_screen_index = 0;
-	char *this_help = 0;
+	const char *this_help = help_strings[0];
 	switch(id) {
 		case MENU_MAIN:
 			Sound_Init(SONG_TEST_SONG,0);

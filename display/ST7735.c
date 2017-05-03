@@ -1531,7 +1531,7 @@ void ST7735_OutCharErase(char ch){
 // The string will not automatically wrap.
 // inputs: ptr  pointer to NULL-terminated ASCII string
 // outputs: none
-void ST7735_OutString(char *ptr){
+void ST7735_OutString(const char *ptr){
   while(*ptr){
     ST7735_OutChar(*ptr);
     ptr = ptr + 1;
