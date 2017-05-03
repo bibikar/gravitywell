@@ -25,18 +25,20 @@
  For more information about my classes, my research, and my books, see
  http://users.ece.utexas.edu/~valvano/
  */
-// ******* Possible Hardware I/O connections*******************
+// *******Hardware I/O connections*******************
 // Slide pot pin 1 connected to ground
 // Slide pot pin 2 connected to PE2/AIN1
 // Slide pot pin 3 connected to +3.3V 
-// fire button connected to PE0
-// special weapon fire button connected to PE1
-// 8*R resistor DAC bit 0 on PB0 (least significant bit)
-// 4*R resistor DAC bit 1 on PB1
-// 2*R resistor DAC bit 2 on PB2
-// 1*R resistor DAC bit 3 on PB3 (most significant bit)
-// LED on PB4
-// LED on PB5
+// 6 bit DAC:
+// 32*750 = 24k resistor DAC bit 0 on PB0 (least significant bit)
+// 16*750 = 12k resistor DAC bit 1 on PB1
+// 8*750 = 6k resistor DAC bit 2 on PB2
+// 4*750 = 3k resistor DAC bit 3 on PB3
+// 2*750 = 1.5k resistor DAC bit 4 on PB4
+// 1*750 = 750 resistor DAC bit 5 on PB5
+// fire missile button connected to PF0
+// fire bomb button connected to PF4
+// PF1-3 are outputs (heartbeats)
 
 // Backlight (pin 10) connected to +3.3 V
 // MISO (pin 9) unconnected
