@@ -1,8 +1,7 @@
-## EE319K - Introduction to Embedded Systems - Lab 10
+# Gravity Well
 
-Find the lab description at link below :
-
-https://docs.google.com/document/d/1s3uQowkEjTSlR0_45svptQb7hqS1_2NCD9HRzErFIx0/edit
+An asteroid field game for the TM4C123 microcontroller (ARM Cortex-M4).
+Written as a final project for EE 319K (Intro to Embedded Systems) at UT.
 
 # Features implemented:
 
